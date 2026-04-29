@@ -1,86 +1,119 @@
-using UnityEngine;
 using System;
-using Unity.VisualScripting;
+using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+namespace Player
 {
-    [Header("Player Stats")]
-    [SerializeField] private float maxHealth = 100f;
-    [SerializeField] private float maxStamina = 100f;
-    [SerializeField] private float staminaDepletionRate = 2f; 
-    [SerializeField] private float staminaRecoveryRate = 5f;
-    [SerializeField] private float staminaThreshold = 10f; // Minimum stamina to start sprinting
-    [SerializeField] private float currentHealth;
-    [SerializeField] private float currentStamina;
-    [SerializeField] private bool spendStamina;
-    private bool isStaminaExhausted = false; // Player can't sprint until stamina >= threshold 
-
-    private void Start()
+    public class PlayerStats : MonoBehaviour
     {
-        currentHealth = maxHealth;
-        currentStamina = maxStamina;
-    }
+        public static event Action<float, float> OnStaminaChanged; 
+        
+        [Header("Player Stats")]
+        [SerializeField] private float maxHealth = 100f;
+        [SerializeField] private float maxStamina = 100f;
+        [SerializeField] private float staminaDepletionRate = 2f; 
+        [SerializeField] private float staminaRecoveryRate = 5f;
+        [SerializeField] private float staminaThreshold = 10f;
+        [SerializeField] private float currentHealth;
+        [SerializeField] private float currentStamina;
+        [SerializeField] private bool spendStamina;
+        [SerializeField] private int maxLives = 3;
+        [SerializeField] private int currentLives = 3;
 
-    private void FixedUpdate()
-    {
-        // Handle stamina depletion while sprinting
-        if (spendStamina && !isStaminaExhausted)
+        private void Awake() 
         {
-            currentStamina -= staminaDepletionRate * Time.fixedDeltaTime;
-            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-            
-            // Check if stamina is fully depleted
-            if (currentStamina <= 0)
-            {
-                currentStamina = 0;
-                isStaminaExhausted = true;
-                spendStamina = false; // Force stop sprinting
-            }
+            currentHealth = maxHealth;
+            currentStamina = maxStamina;    
         }
-        // Handle stamina recovery when not sprinting
-        else if (!spendStamina && currentStamina < maxStamina)
+
+        private void Start()
         {
-            currentStamina += staminaRecoveryRate * Time.fixedDeltaTime;
-            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-            
-            // Check if stamina has recovered enough to allow sprinting again
-            if (currentStamina >= staminaThreshold && isStaminaExhausted)
-            {
-                isStaminaExhausted = false;
-            }
+            OnStaminaChanged?.Invoke(currentStamina, maxStamina);
         }
-    }
 
-    public float Health {
-        get => currentHealth;
-        set => currentHealth = Mathf.Clamp(value, 0, maxHealth);
-    }
-
-    public float Stamina {
-        get => currentStamina;
-        set => currentStamina = Mathf.Clamp(value, 0, maxStamina);
-    }
-
-    public float MaxHealth => maxHealth;
-    public float MaxStamina => maxStamina;
-
-    public void SpendStamina(bool spend)
-    {
-        // Only allow sprinting if stamina is not exhausted
-        if (spend && isStaminaExhausted)
+        private void FixedUpdate()
         {
-            spendStamina = false;
-            return;
+            switch (spendStamina)
+            {
+                case true when !IsStaminaExhausted:
+                {
+                    currentStamina -= staminaDepletionRate * Time.fixedDeltaTime;
+                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+            
+                    if (currentStamina <= 0)
+                    {
+                        currentStamina = 0;
+                        IsStaminaExhausted = true;
+                        spendStamina = false; // Force stop sprinting
+                    }
+
+                    break;
+                }
+                
+                case false when currentStamina < maxStamina:
+                {
+                    currentStamina += staminaRecoveryRate * Time.fixedDeltaTime;
+                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+            
+                    if (currentStamina >= staminaThreshold && IsStaminaExhausted) IsStaminaExhausted = false;
+                    
+                    break;
+                }
+            }
+
+            OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+        }
+
+        public float Health {
+            get => currentHealth;
+            set => currentHealth = Mathf.Clamp(value, 0, maxHealth);
+        }
+
+        public float Stamina {
+            get => currentStamina;
+            set => currentStamina = Mathf.Clamp(value, 0, maxStamina);
         }
         
-        spendStamina = spend;
-    }
+        public int CurrentLives 
+        {
+            get => currentLives;
+            set => currentLives = Mathf.Clamp(value, 0, maxLives);
+        }
 
-    public bool CanSprint()
-    {
-        return !isStaminaExhausted && currentStamina > 0;
-    }
+        public float MaxHealth => maxHealth;
+        
+        public float MaxStamina => maxStamina;
 
-    public float CurrentStamina => currentStamina;
-    public bool IsStaminaExhausted => isStaminaExhausted;
+        public int MaxLives => maxLives;
+
+        public void SpendStamina(bool spend)
+        {
+            if (spend && IsStaminaExhausted)
+            {
+                spendStamina = false;
+                return;
+            }
+        
+            spendStamina = spend;
+        }
+
+        public void SpendStamina(float amount)
+        {
+            if (amount < 0) return; // Prevent negative stamina spending
+        
+            currentStamina -= amount;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+            OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+
+            if (!(currentStamina <= 0)) return;
+            currentStamina = 0;
+            IsStaminaExhausted = true;
+            spendStamina = false;
+        }
+
+        public bool CanSprint() => !IsStaminaExhausted && currentStamina > 0;
+        
+        public float CurrentStamina => currentStamina;
+        
+        private bool IsStaminaExhausted { get; set; }
+    }
 }

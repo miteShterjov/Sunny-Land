@@ -1,60 +1,69 @@
-using System;
 using UnityEngine;
-using UnityEngine.XR;
 
-public class PlayerMovementController : MonoBehaviour
+namespace Player
 {
-    [Header("References")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float runMultiplier = 2f;
-    [SerializeField] private float airControlPercent = 0.7f; // Reduced control in air
-    [SerializeField] private bool isSprintingPressed;
-
-    private Rigidbody2D rb;
-    private PlayerInputHandler inputHandler;
-    private PlayerStats playerStats;
-    private PlayerJumpController jumpController;
-    private PlayerCollisionController collisionController;
-
-    private Vector2 moveInput;
-
-    void Awake()
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(PlayerInputHandler))]
+    [RequireComponent(typeof(PlayerStats))]
+    [RequireComponent(typeof(PlayerCollisionController))]
+    public class PlayerMovementController : MonoBehaviour
     {
-        rb = GetComponent<Rigidbody2D>();
-        inputHandler = GetComponent<PlayerInputHandler>();
-        playerStats = GetComponent<PlayerStats>();
-        jumpController = GetComponent<PlayerJumpController>();
-        collisionController = GetComponent<PlayerCollisionController>();
-    }
+        [Header("References")]
+        [SerializeField] private float moveSpeed = 5f;
+        [SerializeField] private float runMultiplier = 2f;
+        [SerializeField] private float wallSlideSpeed = 1f;
+        [SerializeField] private bool isSprintingPressed;
 
-    private void Update()
-    {
-        moveInput = inputHandler.GetMoveInput();
-        isSprintingPressed = inputHandler.IsSprintPressed();
-        
-        HandleMovement(moveInput);
-        HandleSprinting(isSprintingPressed);
-        
-    }
+        private Rigidbody2D rb;
+        private PlayerInputHandler inputHandler;
+        private PlayerStats playerStats;
+        private PlayerCollisionController collisionController;
+        private Vector2 moveInput;
 
-    private void HandleMovement(Vector2 moveDirection)
-    {
-        SetLinearVelocity(moveDirection * moveSpeed);
-    }
-
-    private void HandleSprinting(bool sprinting)
-    {
-        bool canActuallySprint = sprinting && playerStats.CanSprint() && moveInput.x != 0; 
-        
-        playerStats.SpendStamina(canActuallySprint);
-        
-        if (canActuallySprint)
+        private void Awake()
         {
-            SetLinearVelocity(moveSpeed * runMultiplier * moveInput);
+            rb = GetComponent<Rigidbody2D>();
+            inputHandler = GetComponent<PlayerInputHandler>();
+            playerStats = GetComponent<PlayerStats>();
+            collisionController = GetComponent<PlayerCollisionController>();
+        }
+
+        private void Update()
+        {
+            HandleWallSlide();
+
+            if (!collisionController.IsGrounded) return;
+
+            moveInput = inputHandler.GetMoveInput();
+            isSprintingPressed = inputHandler.IsSprintPressed();
+
+            HandleMovement(moveInput);
+            HandleSprinting(isSprintingPressed);
+        }
+
+        private void HandleWallSlide()
+        {
+            if (!collisionController.IsTouchingWall || collisionController.IsGrounded) return;
+            if (rb.linearVelocity.y >= 0) return;
+
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed));
+        }
+
+        private void HandleMovement(Vector2 moveDirection)
+        {
+            rb.linearVelocity = new Vector2(moveDirection.x * moveSpeed, rb.linearVelocity.y);
+        }
+
+        private void HandleSprinting(bool sprinting)
+        {
+            bool canActuallySprint = sprinting && playerStats.CanSprint() && moveInput.x != 0; 
+        
+            playerStats.SpendStamina(canActuallySprint);
+        
+            if (canActuallySprint)
+            {
+                rb.linearVelocity = new Vector2(moveInput.x * moveSpeed * runMultiplier, rb.linearVelocity.y);
+            }
         }
     }
-
-    private void SetLinearVelocity(Vector2 velocity) => rb.linearVelocity = velocity;
-   
-    private void SetLinearVelocity(float x, float y) => rb.linearVelocity = new Vector2(x, y);
 }

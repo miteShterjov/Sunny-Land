@@ -1,57 +1,75 @@
 using UnityEngine;
 
-public class PlayerJumpController : MonoBehaviour
+namespace Player
 {
-    [Header("Jump Settings")]
-    [SerializeField] private float jumpForce = 15f;
-    
-    [Header("Double Jump")]
-    [SerializeField] private bool isGrounded;
-    [SerializeField] private bool canDoubleJump = true;
-    [SerializeField ] private bool hasDoubleJump = true;
-
-    private Rigidbody2D rb;
-    private PlayerInputHandler inputHandler;
-    private PlayerCollisionController collisionController;
-
-    private void Awake()
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(PlayerStats))]
+    [RequireComponent(typeof(PlayerCollisionController))]
+    [RequireComponent(typeof(PlayerInputHandler))]
+    public class PlayerJumpController : MonoBehaviour
     {
-        rb = GetComponent<Rigidbody2D>();
-        inputHandler = GetComponent<PlayerInputHandler>();
-        collisionController = GetComponent<PlayerCollisionController>();
-    }
+        [Header("Jump Settings")]
+        [SerializeField] private float jumpForce = 15f;
+        [SerializeField] private float doubleJumpForce = 10f;
+        [SerializeField] private float jumpStaminaCost = 5f;
+        [SerializeField] private Vector2 wallJumpForce;
+        [SerializeField] private bool canDoubleJump = true;
 
-    private void Update()
-    {
-        isGrounded = collisionController.IsGrounded;
-        canDoubleJump = !isGrounded && hasDoubleJump;
-        
-        if (isGrounded || hasDoubleJump) HandleInput();
-        if (isGrounded && !hasDoubleJump) ResetDoubleJump();
-    }
+        private bool isGrounded;
+        private bool jumpIsPressed;
 
-    private void HandleInput()
-    {
-        if (inputHandler.IsJumpPressed())
+        private Rigidbody2D rb;
+        private PlayerStats playerStats;
+        private PlayerCollisionController collisionController;
+        private PlayerInputHandler inputHandler;
+
+        private void Awake()
         {
-            if (isGrounded || canDoubleJump) TryJump();
+            rb = GetComponent<Rigidbody2D>();
+            playerStats = GetComponent<PlayerStats>();
+            collisionController = GetComponent<PlayerCollisionController>();
+            inputHandler = GetComponent<PlayerInputHandler>();
         }
-    }
 
-    private void TryJump()
-    {
-        Jump();
-        if (!isGrounded) hasDoubleJump = false;
-    }
+        private void Update()
+        {
+            isGrounded = collisionController.IsGrounded;
+            jumpIsPressed = inputHandler.IsJumpPressed();
 
-    private void Jump()
-    {
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-    }
+            if (playerStats.Stamina <= 0) return;
+            if (isGrounded && !canDoubleJump) ResetDoubleJump();
 
-    private void ResetDoubleJump()
-    {
-        if (collisionController.JustGrounded) hasDoubleJump = true;
+            switch (jumpIsPressed)
+            {
+                case true when isGrounded:
+                    Jump(jumpForce);
+                    break;
+                case true when collisionController.IsTouchingWall && !isGrounded:
+                    WallJump();
+                    break;
+                case true when !isGrounded && canDoubleJump:
+                    Jump(doubleJumpForce);
+                    canDoubleJump = false;
+                    break;
+            }
+        }
+
+        private void Jump(float force)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+            rb.AddForce(Vector2.up * force, ForceMode2D.Impulse);
+            playerStats.SpendStamina(jumpStaminaCost);
+        }
+
+        private void WallJump()
+        {
+            float xDir = collisionController.IsWallRight ? -1f : 1f;
+            rb.linearVelocity = new Vector2(wallJumpForce.x * xDir, wallJumpForce.y);
+            canDoubleJump = true;
+            playerStats.SpendStamina(jumpStaminaCost);
+        }
+
+        private void ResetDoubleJump() => canDoubleJump = true;
     }
 }
  
