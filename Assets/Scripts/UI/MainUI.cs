@@ -1,9 +1,11 @@
+using System;
+using Misc;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI
 {
-    public class MainUI : MonoBehaviour
+    public class MainUI : Singleton<MainUI>
     {
         [Header("Lives UI")]
         [SerializeField] private Image haveLifeSprite;
@@ -12,8 +14,10 @@ namespace UI
 
         private Player.PlayerStats player;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             player = FindFirstObjectByType<Player.PlayerStats>();
             if (!player) Debug.LogError("PlayerStats component not found in the scene. Please ensure there is a GameObject with PlayerStats attached.");
 

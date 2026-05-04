@@ -34,14 +34,14 @@ namespace Player
 
         public void Damage(float amount)
         {
-            currentHealth -= amount;
+            currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
             if (currentHealth <= 0) PlayerDies();
             Debug.Log($"Player took {amount} damage. Current health: {currentHealth}/{maxHealth}");
         
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
-        private void Heal(float amount)
+        public void Heal(float amount)
         {
             if (currentHealth >= maxHealth) 
             {   
@@ -54,14 +54,11 @@ namespace Player
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
-        private void PlayerDies()
-        {
-            Debug.Log("Player has died.");
-        }
+        private void PlayerDies() => GameManager.Instance.OnPlayerDeath();
 
         private void TestingHealthStuff()
         {
-            if (Keyboard.current.tKey.wasPressedThisFrame) Damage(10f);
+            if (Keyboard.current.tKey.wasPressedThisFrame) Damage(90f);
             if (Keyboard.current.yKey.wasPressedThisFrame) Heal(10f);
         }
     }

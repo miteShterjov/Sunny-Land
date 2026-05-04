@@ -111,8 +111,35 @@ namespace Player
         }
 
         public bool CanSprint() => !IsStaminaExhausted && currentStamina > 0;
+
+        public void ResetPlayerStats()
+        {
+            GetComponent<PlayerHealthController>().Heal(maxHealth);
+            currentStamina = maxStamina;
+            RemoveOneLife();
+            IsStaminaExhausted = false;
+            spendStamina = false;
+            OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+        }
         
         public float CurrentStamina => currentStamina;
+
+        public void AddOneLife()
+        {
+            if (currentLives >= maxLives) return;
+            currentLives++;
+        }
+
+        public void RemoveOneLife()
+        {
+            if (currentLives <= 0)
+            {
+                print("Player has no lives left! Game Over logic should be implemented here.");
+                return;
+            }
+            ;
+            currentLives--;
+        }
         
         private bool IsStaminaExhausted { get; set; }
     }
