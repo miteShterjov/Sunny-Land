@@ -39,14 +39,30 @@ namespace UI
 
         private void UpdateStaminaBar()
         {
-            staminaFill.fillAmount = Mathf.MoveTowards(staminaFill.fillAmount, targetStaminaFill, frontSpeedFill * Time.deltaTime);
-            middleStaminaFill.fillAmount = Mathf.MoveTowards(middleStaminaFill.fillAmount, targetHealthFill, middleSpeedFill * Time.deltaTime);
+            if (targetStaminaFill < staminaFill.fillAmount)
+            {
+                staminaFill.fillAmount = Mathf.MoveTowards(staminaFill.fillAmount, targetStaminaFill, frontSpeedFill * Time.deltaTime);
+                middleStaminaFill.fillAmount = Mathf.MoveTowards(middleStaminaFill.fillAmount, targetStaminaFill, middleSpeedFill * Time.deltaTime);
+            }
+            else
+            {
+                staminaFill.fillAmount = Mathf.MoveTowards(staminaFill.fillAmount, targetStaminaFill, middleSpeedFill * Time.deltaTime);
+                middleStaminaFill.fillAmount = Mathf.MoveTowards(middleStaminaFill.fillAmount, targetStaminaFill, frontSpeedFill * Time.deltaTime);
+            }    
         }
 
         private void UpdateHealthBar()
         {
-            healthFill.fillAmount = Mathf.MoveTowards(healthFill.fillAmount, targetHealthFill, frontSpeedFill * Time.deltaTime);
-            middleFill.fillAmount = Mathf.MoveTowards(middleFill.fillAmount, targetHealthFill, middleSpeedFill * Time.deltaTime);
+            if (targetHealthFill < healthFill.fillAmount)
+            {
+                healthFill.fillAmount = Mathf.MoveTowards(healthFill.fillAmount, targetHealthFill, frontSpeedFill * Time.deltaTime);
+                middleFill.fillAmount = Mathf.MoveTowards(middleFill.fillAmount, targetHealthFill, middleSpeedFill * Time.deltaTime);
+            }
+            else
+            {
+                healthFill.fillAmount = Mathf.MoveTowards(healthFill.fillAmount, targetHealthFill, middleSpeedFill * Time.deltaTime);
+                middleFill.fillAmount = Mathf.MoveTowards(middleFill.fillAmount, targetHealthFill, frontSpeedFill * Time.deltaTime);
+            }
         }
 
         private void UpdateHealthSlider(float current, float max) => targetHealthFill = current / max;

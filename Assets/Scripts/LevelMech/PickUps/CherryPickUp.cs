@@ -1,9 +1,13 @@
+using Player;
 using UnityEngine;
 
-public class GemPickUps : MonoBehaviour, IPickUps
+public class CherryPickUp : MonoBehaviour, IPickUps
 {
-    public string PickUpName => "Gem";
+    public string PickUpName => "Cherry";
     
+    [Header("Cherry Settings")]
+    [SerializeField] private float healAmount = 10;
+
     private Animator anim;
     private static readonly int PickUpAnim = Animator.StringToHash("isPickedUp");
 
@@ -12,7 +16,7 @@ public class GemPickUps : MonoBehaviour, IPickUps
         anim = GetComponent<Animator>();
     }
 
-    public void PickUpEffect(GameObject player) => GameManager.Instance.AddGemCollected();
+    public void PickUpEffect(GameObject player) => player.GetComponent<PlayerHealthController>().Heal(healAmount);
     
     public void HandleAnimPickUpEvent() => anim.SetBool(PickUpAnim, true);
     

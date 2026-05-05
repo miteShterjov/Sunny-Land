@@ -1,4 +1,5 @@
 using System;
+using Misc;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,20 +12,18 @@ namespace Player
         public static event Action<float, float> OnHealthChanged; 
 
         private PlayerStats playerStats;
-        private float currentHealth;
-        private float maxHealth;
+        private VFXs visualEffects;
 
         private void Awake()
         {
             playerStats = GetComponent<PlayerStats>();
+            visualEffects = GetComponent<VFXs>();
         }
 
         private void Start()
         {
-            maxHealth = playerStats.MaxHealth;
-            currentHealth = playerStats.Health;
-            print("Player initialized: " + currentHealth + " health, " + maxHealth + " max health.");
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            print("Player initialized: " + playerStats.Health + " health, " + playerStats.MaxHealth + " max health.");
+            OnHealthChanged?.Invoke(playerStats.Health, playerStats.MaxHealth);
         }
 
         private void Update()
@@ -32,33 +31,37 @@ namespace Player
             TestingHealthStuff();
         }
 
-        public void Damage(float amount)
+        public void Damage(Transform source, float amount)
         {
-            currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
-            if (currentHealth <= 0) PlayerDies();
-            Debug.Log($"Player took {amount} damage. Current health: {currentHealth}/{maxHealth}");
+            playerStats.Health = Mathf.Clamp(playerStats.Health - amount, 0, playerStats.MaxHealth);
+            if (playerStats.Health <= 0) PlayerDies();
+            Debug.Log($"Player took {amount} damage. Current health: {playerStats.Health}/{playerStats.MaxHealth}");
+
+            // visualEffects.FlashVFX();
+            visualEffects.Knockback(source, transform, rb: GetComponent<Rigidbody2D>());
+            // visualEffects.Fade();
         
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            OnHealthChanged?.Invoke(playerStats.Health, playerStats.MaxHealth);
         }
 
         public void Heal(float amount)
         {
-            if (currentHealth >= maxHealth) 
+            if (playerStats.Health >= playerStats.MaxHealth) 
             {   
-                currentHealth = maxHealth;
+                playerStats.Health = playerStats.MaxHealth;
                 return;
             }
-            currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-            Debug.Log($"Player healed {amount}. Current health: {currentHealth}/{maxHealth}");
+            playerStats.Health = Mathf.Clamp(playerStats.Health + amount, 0, playerStats.MaxHealth);
+            Debug.Log($"Player healed {amount}. Current health: {playerStats.Health}/{playerStats.MaxHealth}");
             
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            OnHealthChanged?.Invoke(playerStats.Health, playerStats.MaxHealth);
         }
 
         private void PlayerDies() => GameManager.Instance.OnPlayerDeath();
 
         private void TestingHealthStuff()
         {
-            if (Keyboard.current.tKey.wasPressedThisFrame) Damage(90f);
+            if (Keyboard.current.tKey.wasPressedThisFrame) Damage(transform, 10f);
             if (Keyboard.current.yKey.wasPressedThisFrame) Heal(10f);
         }
     }

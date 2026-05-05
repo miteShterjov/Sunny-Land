@@ -2,7 +2,8 @@ using UnityEngine;
 
 public interface IPickUps
 {
-    void ApplyPickUpEffect(GameObject player);
+    public string PickUpName { get; }
+    void PickUpEffect(GameObject player);
     void HandleAnimPickUpEvent();
     void DestroyObject();
 }

@@ -50,7 +50,7 @@ namespace Player
             };
         }
         
-        private void Flip() => transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        public void Flip() => transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
 
         private void HandleMovingAnimEvent() => animator.SetFloat(MovingAnimParam, Mathf.Abs(xVelocity));
         

@@ -8,6 +8,8 @@ namespace Player
     [RequireComponent(typeof(PlayerCollisionController))]
     public class PlayerMovementController : MonoBehaviour
     {
+        public bool IsKnockedBack { get => isKnockedback; set => isKnockedback = value; }
+
         [Header("References")]
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float runMultiplier = 2f;
@@ -19,6 +21,7 @@ namespace Player
         private PlayerStats playerStats;
         private PlayerCollisionController collisionController;
         private Vector2 moveInput;
+        private bool isKnockedback;
 
         private void Awake()
         {
@@ -30,6 +33,8 @@ namespace Player
 
         private void Update()
         {
+            if (isKnockedback) return;
+            
             HandleWallSlide();
 
             if (!collisionController.IsGrounded) return;

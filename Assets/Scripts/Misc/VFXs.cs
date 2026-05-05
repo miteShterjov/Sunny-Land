@@ -1,4 +1,5 @@
 using System.Collections;
+using Player;
 using UnityEngine;
 
 namespace Misc
@@ -14,6 +15,7 @@ namespace Misc
         [SerializeField] private float fadeLevel = 0.4f;
         [Header("Knockback Settings")]
         [SerializeField] private Vector2 knockbackForce = new Vector2(5f, 7f);
+        [SerializeField] private float konckbackCooldown = 0.5f;
         [Header("Flicker VFX Settings")]
         [SerializeField] private float flickerDuration = 1.5f;
         [SerializeField] private float flickerInterval = 0.1f;
@@ -28,6 +30,8 @@ namespace Misc
         private const float FadeFullAlpha = 1f;
         private Camera mainCamera;
 
+        private Vector2 knockbackDirection;
+
         private void Start()
         {
             mainCamera = Camera.main;
@@ -36,6 +40,12 @@ namespace Misc
         private void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
+            if (!spriteRenderer) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        private void Update()
+        {
+            print(knockbackDirection);
         }
 
         public void FlashVFX() => StartCoroutine(StartFlashVFXCoroutine());
@@ -50,9 +60,20 @@ namespace Misc
 
         public void Knockback(Transform source, Transform target, Rigidbody2D rb)
         {
-            Vector2 direction = (target.position - source.position).normalized;
+            var movement = target.GetComponent<PlayerMovementController>();
+            if (movement) movement.IsKnockedBack = true;
+            
             rb.linearVelocity = Vector2.zero;
-            rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
+            float directionX = source.position.x < target.position.x ? 1f : -1f;
+            rb.AddForce(new Vector2(directionX * knockbackForce.x, knockbackForce.y), ForceMode2D.Impulse);
+            
+            StartCoroutine(ClearKnockbackCo(movement));
+        }
+
+        private IEnumerator ClearKnockbackCo(PlayerMovementController movement)
+        {
+            yield return new WaitForSeconds(konckbackCooldown);
+            if (movement) movement.IsKnockedBack = false;
         }
 
         private IEnumerator StartFlashVFXCoroutine()
@@ -64,11 +85,11 @@ namespace Misc
 
         private IEnumerator FadeCoroutine()
         {
-            Color fadeColor = new Color (0, 0, 0, fadeLevel);
+            Color c = spriteRenderer.color;
 
-            spriteRenderer.color = fadeColor;
+            spriteRenderer.color = new Color(c.r, c.g, c.b, fadeLevel);
             yield return new WaitForSeconds(fadeDuration);
-            spriteRenderer.color = new Color(0, 0, 0, FadeFullAlpha);
+            spriteRenderer.color = new Color(c.r, c.g, c.b, FadeFullAlpha);
         }
 
         private IEnumerator FlickerCoroutine()
