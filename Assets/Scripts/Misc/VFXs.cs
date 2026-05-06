@@ -15,7 +15,7 @@ namespace Misc
         [SerializeField] private float fadeLevel = 0.4f;
         [Header("Knockback Settings")]
         [SerializeField] private Vector2 knockbackForce = new Vector2(5f, 7f);
-        [SerializeField] private float konckbackCooldown = 0.5f;
+        [SerializeField] private float knockbackCooldown = 0.5f;
         [Header("Flicker VFX Settings")]
         [SerializeField] private float flickerDuration = 1.5f;
         [SerializeField] private float flickerInterval = 0.1f;
@@ -42,12 +42,7 @@ namespace Misc
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (!spriteRenderer) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
-
-        private void Update()
-        {
-            print(knockbackDirection);
-        }
-
+        
         public void FlashVFX() => StartCoroutine(StartFlashVFXCoroutine());
     
         public void Fade() => StartCoroutine(FadeCoroutine());
@@ -72,7 +67,7 @@ namespace Misc
 
         private IEnumerator ClearKnockbackCo(PlayerMovementController movement)
         {
-            yield return new WaitForSeconds(konckbackCooldown);
+            yield return new WaitForSeconds(knockbackCooldown);
             if (movement) movement.IsKnockedBack = false;
         }
 

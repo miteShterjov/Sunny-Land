@@ -1,51 +1,58 @@
-using System;
 using System.Collections;
-using Managers;
 using Misc;
 using Player;
 using UI;
 using UnityEngine;
 
-public class GameManager : Singleton<GameManager>
+namespace Managers
 {
-    [Header("Player Stats")]
-    [SerializeField] private int gemsCollected = 0;
-
-    private PlayerStats player;
-    private CheckpointManager respwanManager;
-    private FadeUI fadeUI;
-
-    protected override void Awake()
+    public class GameManager : Singleton<GameManager>
     {
-        base.Awake();
-    }
+        [Header("Player Stats")]
+        [SerializeField] private int gemsCollected;
+        [Header("Game Prefs")]
+        [SerializeField] private bool isGameOver;
+        
+        public bool IsGameOver => isGameOver;
 
-    private void Start()
-    {
-        player = FindFirstObjectByType<PlayerStats>();
-        if (!player) Debug.LogError("Player not found by Game Manager.");
-        respwanManager = CheckpointManager.Instance;
-        if (!respwanManager) Debug.LogError("Checkpoint Manager not found by Game Manager.");
-        fadeUI = FadeUI.Instance;
-        if (!fadeUI) Debug.LogError("Fade UI not found by Game Manager.");
-    }
+        private PlayerStats player;
+        private CheckpointManager respawnManager;
+        private FadeUI fadeUI;
 
-    public void AddGemCollected() => gemsCollected++;
+        private void Start()
+        {
+            player = FindFirstObjectByType<PlayerStats>();
+            if (!player) Debug.LogError("Player not found by Game Manager.");
+            respawnManager = CheckpointManager.Instance;
+            if (!respawnManager) Debug.LogError("Checkpoint Manager not found by Game Manager.");
+            fadeUI = FadeUI.Instance;
+            if (!fadeUI) Debug.LogError("Fade UI not found by Game Manager.");
+        }
 
-    public void OnPlayerDeath() => StartCoroutine(PlayerRespawnSequence());
+        private void OnEnable() => PlayerStats.OnLivesChanged += IsTheGameOver;
+        private void OnDisable() => PlayerStats.OnLivesChanged -= IsTheGameOver;
+
+        public void AddGemCollected() => gemsCollected++;
+
+        public void OnPlayerDeath() => StartCoroutine(PlayerRespawnSequence());
     
-    private IEnumerator PlayerRespawnSequence()
-    {
-        // Handles player death and calls few scripts to do what it has to do. 
-        // Sensetive to initialization order bugs cuz of how many scripts it has to call. 
-        // Careful when changing anything related to player death and respawn.
-
-        Time.timeScale = 0f;
-        fadeUI.FadeToBlack();
-        yield return new WaitForSecondsRealtime(1f);
-        player.ResetPlayerStats();
-        player.transform.position = respwanManager.GetCurrentRespawnPoint();
-        fadeUI.FadeToClear();
-        Time.timeScale = 1f;
+        private IEnumerator PlayerRespawnSequence()
+        {
+            // Handles player death and calls few scripts to do what it has to do. 
+            // Sensitive to initialization order bugs because of how many scripts it has to call. 
+            // Careful when changing anything related to player death and respawn.
+            Time.timeScale = 0f;
+            fadeUI.FadeToBlack();
+            yield return new WaitForSecondsRealtime(1f);
+            player.ResetPlayerStats();
+            player.transform.position = respawnManager.GetCurrentRespawnPoint();
+            fadeUI.FadeToClear();
+            Time.timeScale = 1f;
+        }
+        
+        private void IsTheGameOver(int currentLives, int maxLives)
+        {
+            if (currentLives == 0) isGameOver = true;
+        }
     }
 }

@@ -1,34 +1,26 @@
+using LevelMech.PickUps;
 using Misc;
 using Player;
 using UnityEngine;
 
-public class PickUpManager : Singleton<PickUpManager>
+namespace Managers
 {
-    PlayerStats playerStats;
-
-    private void Start()
+    public class PickUpManager : Singleton<PickUpManager>
     {
-        playerStats = FindAnyObjectByType<PlayerStats>();
-        if (!playerStats) Debug.LogError("PlayerStats not found in PickUpManager.");
-    }
+        private PlayerStats playerStats;
 
-
-    public void ApplyPickUpEffect(IPickUps pickUp, GameObject player)
-    {
-        if (pickUp.PickUpName == "Cherry")
+        private void Start()
         {
-            Debug.Log($"Health: {playerStats.Health} | MaxHealth: {playerStats.MaxHealth}");
-            print("its cherry if statement working");
-            if (playerStats.Health >= playerStats.MaxHealth)
-            {
-                print("Player health is already full. Cannot pick up cherry.");
-                Debug.Log($"Health: {playerStats.Health} | MaxHealth: {playerStats.MaxHealth}");
-                return;
-            }
+            playerStats = FindAnyObjectByType<PlayerStats>();
+            if (!playerStats) Debug.LogError("PlayerStats not found in PickUpManager.");
         }
 
-        pickUp.PickUpEffect(player);
-        pickUp.HandleAnimPickUpEvent();
+        public static void ApplyPickUpEffect(IPickUps pickUp, GameObject player)
+        {
+            if (!pickUp.CanPickUp(player)) return;
+            
+            pickUp.OnPickUp(player);
+            pickUp.HandleAnimPickUpEvent();
+        }
     }
-
 }

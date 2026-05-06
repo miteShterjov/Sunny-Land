@@ -6,6 +6,7 @@ namespace Player
     public class PlayerStats : MonoBehaviour
     {
         public static event Action<float, float> OnStaminaChanged; 
+        public static event Action<int, int> OnLivesChanged;
         
         [Header("Player Stats")]
         [SerializeField] private float maxHealth = 100f;
@@ -28,6 +29,7 @@ namespace Player
         private void Start()
         {
             OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+            OnLivesChanged?.Invoke(currentLives, maxLives);
         }
 
         private void FixedUpdate()
@@ -63,12 +65,14 @@ namespace Player
             OnStaminaChanged?.Invoke(currentStamina, maxStamina);
         }
 
-        public float Health {
+        public float CurrentHealth 
+        {
             get => currentHealth;
             set => currentHealth = Mathf.Clamp(value, 0, maxHealth);
         }
 
-        public float Stamina {
+        public float CurrentStamina 
+        {
             get => currentStamina;
             set => currentStamina = Mathf.Clamp(value, 0, maxStamina);
         }
@@ -122,23 +126,18 @@ namespace Player
             OnStaminaChanged?.Invoke(currentStamina, maxStamina);
         }
         
-        public float CurrentStamina => currentStamina;
-
         public void AddOneLife()
         {
             if (currentLives >= maxLives) return;
             currentLives++;
+            OnLivesChanged?.Invoke(currentLives, maxLives);
         }
 
-        public void RemoveOneLife()
+        private void RemoveOneLife() 
         {
-            if (currentLives <= 0)
-            {
-                print("Player has no lives left! Game Over logic should be implemented here.");
-                return;
-            }
-            ;
+            if (currentLives <= 0) return;
             currentLives--;
+            OnLivesChanged?.Invoke(currentLives, maxLives);
         }
         
         private bool IsStaminaExhausted { get; set; }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Player
 {
-[RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(PlayerCollisionController))]
     public class PlayerAnimController : MonoBehaviour
     {

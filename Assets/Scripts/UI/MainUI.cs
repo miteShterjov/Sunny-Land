@@ -1,4 +1,3 @@
-using System;
 using Misc;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,14 +22,11 @@ namespace UI
 
             UpdateLivesUI(player.CurrentLives, player.MaxLives);
         }
+        
+        private void OnEnable() => Player.PlayerStats.OnLivesChanged += UpdateLivesUI;
+        private void OnDisable() => Player.PlayerStats.OnLivesChanged -= UpdateLivesUI;
 
-        private void Update()
-        {
-            // !!! when i do some propper logic in a player controller this will be removed
-            UpdateLivesUI(player.CurrentLives, player.MaxLives);
-        }
-
-        private void UpdateLivesUI(int currentLives, int maxLives)
+        public void UpdateLivesUI(int currentLives, int maxLives)
         {
             foreach (Transform child in livesContainer)
             {

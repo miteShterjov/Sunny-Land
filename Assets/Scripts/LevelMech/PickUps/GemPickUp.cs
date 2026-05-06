@@ -1,26 +1,36 @@
+using Managers;
+using Player;
 using UnityEngine;
 
-public class GemPickUps : MonoBehaviour, IPickUps
+namespace LevelMech.PickUps
 {
-    public string PickUpName => "Gem";
-    
-    private Animator anim;
-    private static readonly int PickUpAnim = Animator.StringToHash("isPickedUp");
-
-    private void Awake() 
+    [RequireComponent(typeof(Animator))]
+    public class GemPickUps : MonoBehaviour, IPickUps
     {
-        anim = GetComponent<Animator>();
-    }
+        private Animator anim;
+        private static readonly int PickUpAnim = Animator.StringToHash("isPickedUp");
 
-    public void PickUpEffect(GameObject player) => GameManager.Instance.AddGemCollected();
-    
-    public void HandleAnimPickUpEvent() => anim.SetBool(PickUpAnim, true);
-    
-    public void DestroyObject() => Destroy(gameObject);
+        private void Awake() 
+        {
+            anim = GetComponent<Animator>();
+        }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (!collision.CompareTag("Player")) return;
-        PickUpManager.Instance.ApplyPickUpEffect(this, collision.gameObject);
+        public void OnPickUp(GameObject player) => GameManager.Instance.AddGemCollected();
+
+        public bool CanPickUp(GameObject player)
+        {
+            PlayerStats playerStats = player.GetComponent<PlayerStats>();
+            return playerStats.CurrentHealth >= playerStats.MaxHealth;
+        }
+    
+        public void HandleAnimPickUpEvent() => anim.SetBool(PickUpAnim, true);
+    
+        public void DestroyObject() => Destroy(gameObject);
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (!collision.CompareTag("Player")) return;
+            PickUpManager.ApplyPickUpEffect(this, collision.gameObject);
+        }
     }
 }

@@ -1,9 +1,12 @@
 using UnityEngine;
 
-public class DestroySelf : MonoBehaviour
+namespace Misc
 {
-    public void Start()
+    public class DestroySelf : MonoBehaviour
     {
-        Destroy(gameObject);
+        public void Start()
+        {
+            Destroy(gameObject);
+        }
     }
 }

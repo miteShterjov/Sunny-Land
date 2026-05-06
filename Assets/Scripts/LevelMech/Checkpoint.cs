@@ -1,9 +1,9 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace LevelMech
-{   
+{
+    [RequireComponent(typeof(SpriteRenderer))]
     public class Checkpoint : MonoBehaviour
     {
         public static event Action<Checkpoint> OnSpawnStatusChanged;
@@ -12,37 +12,35 @@ namespace LevelMech
         [SerializeField] private Sprite respawnOff;
         [SerializeField] private Sprite respawnOn;
 
-        private Vector3 _respawnPoint;
-        private SpriteRenderer _spriteRenderer;
-        private bool _isActiveRespawnPoint;
-        private bool _wasActiveSpawnPoint;
+        private SpriteRenderer spriteRenderer;
+        private bool isActiveRespawnPoint;
+        private bool wasActiveSpawnPoint;
 
         private void Awake()
         {
-            _respawnPoint = transform.position;
-            _spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
-            if (_wasActiveSpawnPoint) return;
-            if (_isActiveRespawnPoint) return;
+            if (wasActiveSpawnPoint) return;
+            if (isActiveRespawnPoint) return;
 
             OnSpawnStatusChanged?.Invoke(this);
         }
 
         public void ActivateRespawnPoint()
         {
-            _isActiveRespawnPoint = true;
-            _spriteRenderer.sprite = respawnOn;
+            isActiveRespawnPoint = true;
+            spriteRenderer.sprite = respawnOn;
         }
 
         public void DeactivateRespawnPoint()
         {
-            _isActiveRespawnPoint = false;
-            _wasActiveSpawnPoint = true;
-            _spriteRenderer.sprite = respawnOff;
+            isActiveRespawnPoint = false;
+            wasActiveSpawnPoint = true;
+            spriteRenderer.sprite = respawnOff;
         }
     }
 }

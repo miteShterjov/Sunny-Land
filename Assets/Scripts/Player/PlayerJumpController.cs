@@ -36,7 +36,7 @@ namespace Player
             isGrounded = collisionController.IsGrounded;
             jumpIsPressed = inputHandler.IsJumpPressed();
 
-            if (playerStats.Stamina <= 0) return;
+            if (playerStats.CurrentStamina <= 0) return;
             if (isGrounded && !canDoubleJump) ResetDoubleJump();
 
             switch (jumpIsPressed)

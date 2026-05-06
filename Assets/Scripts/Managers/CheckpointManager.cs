@@ -1,4 +1,3 @@
-using System;
 using LevelMech;
 using Player;
 using UnityEngine;
@@ -8,18 +7,11 @@ namespace Managers
 {
     public class CheckpointManager : Singleton<CheckpointManager>
     {
-        private Checkpoint[] respawnpoints;
         private Checkpoint currentActiveRespawnPoint;
         private Vector3 currentRespawnPoint;
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
         private void Start()
         {
-            respawnpoints = UnityEngine.Object.FindObjectsByType<Checkpoint>(FindObjectsSortMode.None);
             currentRespawnPoint = FindFirstObjectByType<PlayerStats>().transform.position;
         }
 
@@ -35,12 +27,12 @@ namespace Managers
 
         public Vector3 GetCurrentRespawnPoint() => currentRespawnPoint;
         
-        private void SaveActiveRespawnPoint(Checkpoint respawnpoint)
+        private void SaveActiveRespawnPoint(Checkpoint respawnPoint)
         {
             if (currentActiveRespawnPoint) currentActiveRespawnPoint.DeactivateRespawnPoint();
-            currentActiveRespawnPoint = respawnpoint;
-            currentRespawnPoint = respawnpoint.transform.position;
-            respawnpoint.ActivateRespawnPoint();
+            currentActiveRespawnPoint = respawnPoint;
+            currentRespawnPoint = respawnPoint.transform.position;
+            respawnPoint.ActivateRespawnPoint();
         }
     }
 }

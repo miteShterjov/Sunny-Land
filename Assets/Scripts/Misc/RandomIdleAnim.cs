@@ -1,20 +1,24 @@
 using UnityEngine;
 
-public class RandomIdleAnim : MonoBehaviour
+namespace Misc
 {
-    private Animator _animator;
-
-    void Awake()
+    [RequireComponent(typeof(Animator))]
+    public class RandomIdleAnim : MonoBehaviour
     {
-        _animator = GetComponent<Animator>();
-    }
+        private Animator animator;
 
-    void Start()
-    {
-        if (!_animator) return;
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+        }
 
-        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-        _animator.Play(stateInfo.fullPathHash, -1, Random.Range(0f, 1f));
+        private void Start()
+        {
+            if (!animator) return;
+
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            animator.Play(stateInfo.fullPathHash, -1, Random.Range(0f, 1f));
+        }
     }
 }
 

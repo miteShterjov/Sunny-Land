@@ -1,9 +1,13 @@
+using Player;
 using UnityEngine;
 
-public interface IPickUps
+namespace LevelMech.PickUps
 {
-    public string PickUpName { get; }
-    void PickUpEffect(GameObject player);
-    void HandleAnimPickUpEvent();
-    void DestroyObject();
+    public interface IPickUps
+    {
+        void OnPickUp(GameObject player);
+        bool CanPickUp(GameObject player);
+        void HandleAnimPickUpEvent();
+        void DestroyObject();
+    }
 }
