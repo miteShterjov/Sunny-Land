@@ -4,7 +4,7 @@ namespace Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(PlayerInputHandler))]
-    [RequireComponent(typeof(PlayerStats))]
+    [RequireComponent(typeof(PlayerData))]
     [RequireComponent(typeof(PlayerCollisionController))]
     public class PlayerMovementController : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace Player
 
         private Rigidbody2D rb;
         private PlayerInputHandler inputHandler;
-        private PlayerStats playerStats;
+        private PlayerData playerStats;
         private PlayerCollisionController collisionController;
         private Vector2 moveInput;
         private bool isKnockedback;
@@ -27,7 +27,7 @@ namespace Player
         {
             rb = GetComponent<Rigidbody2D>();
             inputHandler = GetComponent<PlayerInputHandler>();
-            playerStats = GetComponent<PlayerStats>();
+            playerStats = GetComponent<PlayerData>();
             collisionController = GetComponent<PlayerCollisionController>();
         }
 

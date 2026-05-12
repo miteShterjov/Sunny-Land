@@ -4,9 +4,8 @@ namespace Misc
 {
     public class DestroySelf : MonoBehaviour
     {
-        public void Start()
-        {
-            Destroy(gameObject);
-        }
+        [SerializeField] private float delay = 0f;
+
+        public void DestroyObject() => Destroy(gameObject, delay);
     }
 }

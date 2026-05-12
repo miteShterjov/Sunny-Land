@@ -17,7 +17,9 @@ GameObject:
   - component: {fileID: 9177429350290753709}
   - component: {fileID: 2016523965187257697}
   - component: {fileID: 6625705762981822970}
+  - component: {fileID: 319904750746178826}
   - component: {fileID: 1063549343422003130}
+  - component: {fileID: 2045476917246919120}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -125,6 +127,8 @@ MonoBehaviour:
   currentHealth: 0
   currentStamina: 0
   spendStamina: 0
+  maxLives: 3
+  currentLives: 3
 --- !u!114 &7450278442706140959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,6 +212,18 @@ MonoBehaviour:
   isGrounded: 0
   isWallLeft: 0
   isWallRight: 0
+--- !u!114 &319904750746178826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946180791497751040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b7d3df080201ddefa30c192cc3d3aed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttackController
 --- !u!114 &1063549343422003130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,6 +236,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2de8b2bba9f6480e86aa2a1903c4ec53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerHealthController
+  testDamageAmount: 50
+  isInvincible: 0
+  invincibilityDuration: 1
+--- !u!114 &2045476917246919120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946180791497751040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df6d1d255e6f43777bab409e6064f84e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Misc.VFXs
+  flashDuration: 0.2
+  flashMaterial: {fileID: 2100000, guid: 051e2183e4d6f9a59b6ab7a7ed2bfda5, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  fadeDuration: 1
+  fadeLevel: 0.4
+  knockbackForce: {x: 2, y: 3}
+  knockbackCooldown: 0.5
+  flickerDuration: 1.5
+  flickerInterval: 0.1
+  squashDuration: 0.1
+  squashScale: {x: 1.3, y: 0.7, z: 1}
+  shakeDuration: 0.2
+  shakeMagnitude: 0.1
 --- !u!1 &7860988618481114806
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,9 +275,9 @@ GameObject:
   - component: {fileID: 6217265715728825902}
   - component: {fileID: 1136234188189112473}
   - component: {fileID: 8621146759070744024}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Foxy
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

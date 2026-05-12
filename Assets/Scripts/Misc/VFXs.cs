@@ -65,10 +65,24 @@ namespace Misc
             StartCoroutine(ClearKnockbackCo(movement));
         }
 
+        public void EnemyKnockback(Transform source, Transform target, Rigidbody2D rb)
+        {
+            rb.linearVelocity = Vector2.zero;
+            float directionX = source.position.x < target.position.x ? 1f : -1f;
+            rb.AddForce(new Vector2(directionX * knockbackForce.x, knockbackForce.y), ForceMode2D.Impulse);
+
+            StartCoroutine(KnockbackDurationCo());
+        }
+
         private IEnumerator ClearKnockbackCo(PlayerMovementController movement)
         {
             yield return new WaitForSeconds(knockbackCooldown);
             if (movement) movement.IsKnockedBack = false;
+        }
+
+        private IEnumerator KnockbackDurationCo()
+        {
+            yield return new WaitForSeconds(knockbackCooldown);
         }
 
         private IEnumerator StartFlashVFXCoroutine()

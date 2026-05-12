@@ -1,7 +1,7 @@
 using Player;
 using UnityEngine;
 
-namespace Enemy
+namespace Enemies
 {
     public class Damager : MonoBehaviour
     {
@@ -11,7 +11,7 @@ namespace Enemy
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
-            other.GetComponent<PlayerHealthController>().Damage(transform, damageAmount);
+            other.GetComponent<PlayerHealthController>()?.Damage(transform, damageAmount);
         }
     }
 }

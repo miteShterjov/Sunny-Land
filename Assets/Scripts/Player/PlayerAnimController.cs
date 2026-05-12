@@ -6,6 +6,8 @@ namespace Player
     [RequireComponent(typeof(PlayerCollisionController))]
     public class PlayerAnimController : MonoBehaviour
     {
+        public float FacingDirection { get; private set; }
+
         private Animator animator;
         private Rigidbody2D rb;
         private PlayerCollisionController collisionController;
@@ -13,11 +15,13 @@ namespace Player
         private float xVelocity;
         private float yVelocity;
         private bool isGrounded;
-    
+        private bool isHurt;
+
         private static readonly int MovingAnimParam = Animator.StringToHash("xVelocity");
         private static readonly int JumpAnimParam = Animator.StringToHash("yVelocity");
         private static readonly int IsGroundedAnimParam = Animator.StringToHash("isGrounded");
         private static readonly int WallGrabParam = Animator.StringToHash("wallDetected");
+        private static readonly int HurtAnimParam = Animator.StringToHash("isHurt");
 
         private void Awake()
         {
@@ -38,22 +42,30 @@ namespace Player
             HandleMovingAnimEvent();
             HandleJumpingAnimEvent();
             if (!collisionController.IsTouchingWall || isGrounded) HandleFacingDirection(xVelocity);
+            HandleHurtAnimEvent(isHurt);
         }
+
+        private void OnEnable() => PlayerHealthController.OnInvincibilityChanged += PlayerIsHurt;
+        private void OnDisable() => PlayerHealthController.OnInvincibilityChanged -= PlayerIsHurt;
 
         private void HandleFacingDirection(float horizontalVelocity)
         {
-            transform.localScale = horizontalVelocity switch
+            if (horizontalVelocity > 0.01f)
             {
-                > 0.01f => new Vector3(1, 1, 1),
-                < -0.01f => new Vector3(-1, 1, 1),
-                _ => transform.localScale
-            };
+                transform.localScale = new Vector3(1, 1, 1);
+                FacingDirection = 1f;
+            }
+            else if (horizontalVelocity < -0.01f)
+            {
+                transform.localScale = new Vector3(-1, 1, 1);
+                FacingDirection = -1f;
+            }
         }
-        
-        public void Flip() => transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+
+        private void PlayerIsHurt(bool isInvincible) => isHurt = isInvincible;
 
         private void HandleMovingAnimEvent() => animator.SetFloat(MovingAnimParam, Mathf.Abs(xVelocity));
-        
+
         private void HandleJumpingAnimEvent() => animator.SetFloat(JumpAnimParam, yVelocity);
 
         private void HandleWallGrabAnimEvent()
@@ -69,5 +81,7 @@ namespace Player
             else if (collisionController.IsWallLeft)
                 transform.localScale = new Vector3(-1, 1, 1);
         }
+
+        private void HandleHurtAnimEvent(bool isInvincible) => animator.SetBool(HurtAnimParam, isInvincible);
     }
 }

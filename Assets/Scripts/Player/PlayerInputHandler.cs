@@ -26,6 +26,7 @@ namespace Player
             inputActions.Player.Sprint.canceled += HandleSprintInputCanceled;
             inputActions.Player.Jump.performed += HandleJumpInput;
             inputActions.Player.Jump.canceled += HandleJumpInputCanceled;
+            inputActions.Player.Attack.performed += HandleAttackInput;            
         }
 
         private void OnDisable()
@@ -36,6 +37,7 @@ namespace Player
             inputActions.Player.Sprint.canceled -= HandleSprintInputCanceled;
             inputActions.Player.Jump.performed -= HandleJumpInput;
             inputActions.Player.Jump.canceled -= HandleJumpInputCanceled;
+            inputActions.Player.Attack.performed -= HandleAttackInput;
             inputActions.Player.Disable();
         }
         
@@ -76,6 +78,11 @@ namespace Player
         private void HandleJumpInputCanceled(InputAction.CallbackContext context)
         {
             jumpPressed = false;
+        }
+
+        private void HandleAttackInput(InputAction.CallbackContext context)
+        {
+            GetComponent<PlayerAttackController>().SpecialAttack();
         }
     }
 }

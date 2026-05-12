@@ -22,8 +22,8 @@ namespace LevelMech.PickUps
 
         public bool CanPickUp(GameObject player)
         {
-            PlayerStats playerStats = player.GetComponent<PlayerStats>();
-            return playerStats.CurrentHealth >= playerStats.MaxHealth;
+            PlayerData playerStats = player.GetComponent<PlayerData>();
+            return playerStats.CurrentHealth < playerStats.MaxHealth;
         }
     
         public void HandleAnimPickUpEvent() => anim.SetBool(PickUpAnim, true);

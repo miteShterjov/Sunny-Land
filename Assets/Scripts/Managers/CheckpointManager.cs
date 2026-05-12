@@ -12,7 +12,7 @@ namespace Managers
 
         private void Start()
         {
-            currentRespawnPoint = FindFirstObjectByType<PlayerStats>().transform.position;
+            currentRespawnPoint = FindFirstObjectByType<PlayerData>().transform.position;
         }
 
         private void OnEnable()

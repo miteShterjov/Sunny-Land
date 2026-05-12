@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(PlayerStats))]
+    [RequireComponent(typeof(PlayerData))]
     [RequireComponent(typeof(PlayerCollisionController))]
     [RequireComponent(typeof(PlayerInputHandler))]
     public class PlayerJumpController : MonoBehaviour
@@ -19,14 +19,14 @@ namespace Player
         private bool jumpIsPressed;
 
         private Rigidbody2D rb;
-        private PlayerStats playerStats;
+        private PlayerData playerStats;
         private PlayerCollisionController collisionController;
         private PlayerInputHandler inputHandler;
 
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
-            playerStats = GetComponent<PlayerStats>();
+            playerStats = GetComponent<PlayerData>();
             collisionController = GetComponent<PlayerCollisionController>();
             inputHandler = GetComponent<PlayerInputHandler>();
         }

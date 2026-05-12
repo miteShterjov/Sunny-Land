@@ -15,13 +15,9 @@ namespace LevelMech.PickUps
             anim = GetComponent<Animator>();
         }
 
-        public void OnPickUp(GameObject player) => GameManager.Instance.AddGemCollected();
+        public void OnPickUp(GameObject player) => GameManager.Instance.GemsCollected++;
 
-        public bool CanPickUp(GameObject player)
-        {
-            PlayerStats playerStats = player.GetComponent<PlayerStats>();
-            return playerStats.CurrentHealth >= playerStats.MaxHealth;
-        }
+        public bool CanPickUp(GameObject player) => true;
     
         public void HandleAnimPickUpEvent() => anim.SetBool(PickUpAnim, true);
     

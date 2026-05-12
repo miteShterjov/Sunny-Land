@@ -15,13 +15,13 @@ namespace Managers
         
         public bool IsGameOver => isGameOver;
 
-        private PlayerStats player;
+        private PlayerData player;
         private CheckpointManager respawnManager;
         private FadeUI fadeUI;
 
         private void Start()
         {
-            player = FindFirstObjectByType<PlayerStats>();
+            player = FindFirstObjectByType<PlayerData>();
             if (!player) Debug.LogError("Player not found by Game Manager.");
             respawnManager = CheckpointManager.Instance;
             if (!respawnManager) Debug.LogError("Checkpoint Manager not found by Game Manager.");
@@ -29,10 +29,10 @@ namespace Managers
             if (!fadeUI) Debug.LogError("Fade UI not found by Game Manager.");
         }
 
-        private void OnEnable() => PlayerStats.OnLivesChanged += IsTheGameOver;
-        private void OnDisable() => PlayerStats.OnLivesChanged -= IsTheGameOver;
+        private void OnEnable() => PlayerData.OnLivesChanged += IsTheGameOver;
+        private void OnDisable() => PlayerData.OnLivesChanged -= IsTheGameOver;
 
-        public void AddGemCollected() => gemsCollected++;
+        public int GemsCollected { set => gemsCollected = value; get => gemsCollected; }
 
         public void OnPlayerDeath() => StartCoroutine(PlayerRespawnSequence());
     

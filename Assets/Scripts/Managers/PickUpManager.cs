@@ -7,11 +7,11 @@ namespace Managers
 {
     public class PickUpManager : Singleton<PickUpManager>
     {
-        private PlayerStats playerStats;
+        private PlayerData playerStats;
 
         private void Start()
         {
-            playerStats = FindAnyObjectByType<PlayerStats>();
+            playerStats = FindAnyObjectByType<PlayerData>();
             if (!playerStats) Debug.LogError("PlayerStats not found in PickUpManager.");
         }
 
