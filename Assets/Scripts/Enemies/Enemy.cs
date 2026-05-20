@@ -1,11 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Enemies
 {
     [RequireComponent(typeof(Rigidbody2D))]
     public abstract class Enemy : MonoBehaviour
     {
+        public bool IsKnockback { get => isKnockback; set => isKnockback = value; }
+
         [Header("Stats")]
         [SerializeField] protected float maxHealth;
         [SerializeField] protected float moveSpeed;
@@ -27,17 +30,22 @@ namespace Enemies
         [SerializeField] protected bool isPlayerInAttackRange;
         [SerializeField] protected LayerMask whatIsGround;
         [SerializeField] protected LayerMask whatIsPlayer;
-        [SerializeField] protected bool isTurnedRifht;
+        [FormerlySerializedAs("isTurnedRifht")]
+        [SerializeField] protected bool isTurnedRight;
         [SerializeField] protected int facingDir;
+        [FormerlySerializedAs("isKnockbacked")]
+        [SerializeField] private bool isKnockback;
 
-        protected float currentHealth;
-        protected Animator animator;
         protected Rigidbody2D rb;
-        protected Vector3[] patrolPositions;
-        protected int currentPatrolIndex;
-        protected Vector3 startingPosition;
-        protected bool isWaitingAtPatrolPoint;
-        protected bool isDead;
+        protected Transform playerTransform;
+        protected Animator animator;
+
+        private float currentHealth;
+        private bool isDead;
+        private Vector3[] patrolPositions;
+        private int currentPatrolIndex;
+        private Vector3 startingPosition;
+        private bool isWaitingAtPatrolPoint;
 
         private static readonly int MoveAnimParam = Animator.StringToHash("xVelocity");
 
@@ -46,17 +54,15 @@ namespace Enemies
             currentHealth = maxHealth;
             animator = GetComponentInChildren<Animator>();
             rb = GetComponent<Rigidbody2D>();
+            playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
 
         protected virtual void Start()
         {
             startingPosition = transform.position;
             HandlePatrolPointsToVector3();
-            
-            if (canPatrol) HandleStateMachine(EnemyState.Patrol);
-            else HandleStateMachine(EnemyState.Idle);
-
-            facingDir = isTurnedRifht ? 1 : -1;
+            facingDir = isTurnedRight ? 1 : -1;
+            currentState = canPatrol ? EnemyState.Patrol : EnemyState.Idle;
         }
 
         protected virtual void Update()
@@ -67,36 +73,32 @@ namespace Enemies
             HandleAnimEvents();
         }
 
-        // handles the state machine transitions and ensures that the same state is not re-entered
-        protected virtual void HandleStateMachine(EnemyState newState)
-        {
-            if (currentState == newState) return;
-            currentState = newState; 
-            SwichState(currentState);
-        }
+        // Only sets state — does NOT run state logic
+        protected virtual void HandleStateMachine(EnemyState newState) => currentState = newState;
 
-        // runs every frame and handles the state machine logic for the current state
-        protected virtual void HandleCurrentState() => SwichState(currentState);
-
-        protected virtual void SwichState(EnemyState currentState)
+        // Runs state logic every frame
+        protected virtual void HandleCurrentState()
         {
             switch (currentState)
             {
-                case EnemyState.Idle: HandleIdleState(); break;
+                case EnemyState.Idle:   HandleIdleState();   break;
                 case EnemyState.Patrol: HandlePatrolState(); break;
-                case EnemyState.Chase: HandleChaseState(); break;
+                case EnemyState.Chase:  HandleChaseState();  break;
                 case EnemyState.Attack: HandleAttackState(); break;
-                case EnemyState.Dead: HandleDeadState(); break;
+                case EnemyState.Dead:   HandleDeadState();   break;
             }
         }
 
         protected virtual void HandleDetectionAndStateTransitions()
         {
-            if (isDead) 
+            if (isDead)
             {
                 HandleStateMachine(EnemyState.Dead);
                 return;
             }
+
+            // Don't interrupt a timed patrol wait
+            if (isWaitingAtPatrolPoint) return;
 
             if (isPlayerInAttackRange)
             {
@@ -110,63 +112,56 @@ namespace Enemies
                 return;
             }
 
-            if (canPatrol)
-            {
-                HandleStateMachine(EnemyState.Patrol);
-                return;
-            }
-
-            HandleStateMachine(EnemyState.Idle);
+            HandleStateMachine(canPatrol ? EnemyState.Patrol : EnemyState.Idle);
         }
 
         protected virtual void HandleIdleState()
         {
-            rb.linearVelocity = Vector2.zero;
-            if (isWaitingAtPatrolPoint) return;
-
-            float distanceFromStartPos = 0.5f;
-
-            if (Vector2.Distance(transform.position, startingPosition) > distanceFromStartPos)
+            if (isWaitingAtPatrolPoint)
             {
-                float direction = Mathf.Sign(startingPosition.x - transform.position.x);
-                rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
-                if (direction != facingDir) Flip();
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                return;
             }
 
-            if (Vector2.Distance(transform.position, startingPosition) <= distanceFromStartPos)
+            float distanceFromStart = Vector2.Distance(transform.position, startingPosition);
+
+            if (distanceFromStart > 0.5f)
             {
-                rb.linearVelocity = Vector2.zero;
+                float direction = Mathf.Sign(startingPosition.x - transform.position.x);
+                if (!Mathf.Approximately(direction, facingDir)) Flip();
+                rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
+            }
+            else
+            {
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             }
         }
 
         protected virtual void HandlePatrolState()
         {
-            if (patrolPositions.Length == 0) return;
+            if (patrolPositions == null || patrolPositions.Length == 0) return;
+
             Vector2 targetPos = patrolPositions[currentPatrolIndex];
+            int dirToTarget = (int)Mathf.Sign(targetPos.x - transform.position.x);
 
-            rb.linearVelocity = new Vector2(Mathf.Sign(targetPos.x - transform.position.x) * patrolSpeed, rb.linearVelocity.y);
+            // Flip to face patrol direction
+            if (dirToTarget != 0 && dirToTarget != facingDir) Flip();
 
-            if (!isWaitingAtPatrolPoint && Vector2.Distance(transform.position, targetPos) < 0.25f)
-            {
-                currentPatrolIndex = (currentPatrolIndex + 1) % patrolPositions.Length;
-                StartCoroutine(WaitAtPatrolPointCo());
-            }
+            rb.linearVelocity = new Vector2(dirToTarget * patrolSpeed, rb.linearVelocity.y);
+
+            if (isWaitingAtPatrolPoint || !(Vector2.Distance(transform.position, targetPos) < 0.25f)) return;
+            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPositions.Length;
+            StartCoroutine(WaitAtPatrolPointCo());
         }
 
-        protected virtual void HandleChaseState() 
+        protected virtual void HandleChaseState()
         {
-                if (!isPlayerInAggroRange)
-                {
-                    HandleStateMachine(EnemyState.Idle);
-                    return;
-                }
-    
-                rb.linearVelocity = new Vector2(facingDir * chaseSpeed, rb.linearVelocity.y);
-    
-                if (isPlayerInAttackRange)
-                {
-                    HandleStateMachine(EnemyState.Attack);
-                }
+            if (!playerTransform) return;
+
+            int dirToPlayer = playerTransform.position.x > transform.position.x ? 1 : -1;
+            if (dirToPlayer != facingDir) Flip();
+
+            rb.linearVelocity = new Vector2(facingDir * chaseSpeed, rb.linearVelocity.y);
         }
 
         protected virtual void HandleAttackState() { }
@@ -174,7 +169,7 @@ namespace Enemies
 
         protected virtual void HandlePatrolPointsToVector3()
         {
-            if (patrolPoints.Length == 0) return;
+            if (patrolPoints == null || patrolPoints.Length == 0) return;
             patrolPositions = new Vector3[patrolPoints.Length];
             for (int i = 0; i < patrolPoints.Length; i++)
             {
@@ -200,64 +195,60 @@ namespace Enemies
         {
             isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
             isWallDetected = Physics2D.Raycast(transform.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround);
-            isPlayerInAggroRange = Physics2D.Raycast(transform.position, Vector2.right * facingDir, aggroRange, whatIsPlayer);
-            isPlayerInAttackRange = Physics2D.Raycast(transform.position, Vector2.right * facingDir, attackRange, whatIsPlayer);
+
+            // Cast both directions so player is detected regardless of which side they're on
+            isPlayerInAggroRange =
+                Physics2D.Raycast(transform.position, Vector2.right, aggroRange, whatIsPlayer) ||
+                Physics2D.Raycast(transform.position, Vector2.left,  aggroRange, whatIsPlayer);
+
+            isPlayerInAttackRange =
+                Physics2D.Raycast(transform.position, Vector2.right, attackRange, whatIsPlayer) ||
+                Physics2D.Raycast(transform.position, Vector2.left,  attackRange, whatIsPlayer);
         }
 
         protected virtual void OnDrawGizmos()
         {
-            // Ground Check
+            // Ground check
             Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawLine(
-                transform.position,
-                new Vector2(transform.position.x, transform.position.y - groundCheckDistance)
-                );
-            Gizmos.DrawWireSphere(new Vector2(transform.position.x, transform.position.y - groundCheckDistance), 0.2f);
+            Gizmos.DrawLine(transform.position,
+                new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
+            Gizmos.DrawWireSphere(
+                new Vector2(transform.position.x, transform.position.y - groundCheckDistance), 0.2f);
 
-            // Wall Check
+            // Wall check
             Gizmos.color = isWallDetected ? Color.green : Color.red;
-            Gizmos.DrawLine(
-                transform.position,
-                new Vector2(transform.position.x + 0.15f + (wallCheckDistance * facingDir), transform.position.y)
-                );
-            Gizmos.DrawWireSphere(new Vector2(transform.position.x + 0.15f + (wallCheckDistance * facingDir), transform.position.y), 0.2f);
+            Gizmos.DrawLine(transform.position,
+                new Vector2(transform.position.x + 0.15f + wallCheckDistance * facingDir, transform.position.y));
+            Gizmos.DrawWireSphere(
+                new Vector2(transform.position.x + 0.15f + wallCheckDistance * facingDir, transform.position.y), 0.2f);
 
-            // Aggro Check
+            // Aggro range — sphere reflects bidirectional detection
             Gizmos.color = isPlayerInAggroRange ? Color.red : Color.white;
-            Gizmos.DrawLine(
-                transform.position,
-                new Vector2(transform.position.x - 0.15f + (aggroRange * facingDir), transform.position.y)
-                );
-            Gizmos.DrawWireSphere(new Vector2(transform.position.x - 0.15f + (aggroRange * facingDir), transform.position.y), 0.2f);
+            Gizmos.DrawWireSphere(transform.position, aggroRange);
 
-            // Attack Check
+            // Attack range — sphere reflects bidirectional detection
             Gizmos.color = isPlayerInAttackRange ? Color.red : Color.white;
-            Gizmos.DrawLine(
-                transform.position,
-                new Vector2(transform.position.x + (attackRange * facingDir), transform.position.y)
-                );
-            Gizmos.DrawWireSphere(new Vector2(transform.position.x + (attackRange * facingDir), transform.position.y), 0.2f);
+            Gizmos.DrawWireSphere(transform.position, attackRange);
         }
 
-        protected IEnumerator WaitAtPatrolPointCo()
+        private IEnumerator WaitAtPatrolPointCo()
         {
             isWaitingAtPatrolPoint = true;
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             HandleStateMachine(EnemyState.Idle);
             yield return new WaitForSeconds(1f);
             isWaitingAtPatrolPoint = false;
-            Flip();
             HandleStateMachine(EnemyState.Patrol);
+            Flip();
         }
 
         public virtual void TakeDamage(float damage)
         {
             if (isDead) return;
             currentHealth -= damage;
-            if (currentHealth <= 0)
-            {
-                isDead = true;
-                HandleStateMachine(EnemyState.Dead);
-            }
+            if (!(currentHealth <= 0)) return;
+            isDead = true;
+            HandleStateMachine(EnemyState.Dead);
         }
 
         public virtual void TakeHeal(float healAmount)
@@ -266,9 +257,6 @@ namespace Enemies
             currentHealth += healAmount;
             if (currentHealth > maxHealth) currentHealth = maxHealth;
         }
-
-
-
     }
 
     public enum EnemyState { Idle, Patrol, Chase, Attack, Dead }

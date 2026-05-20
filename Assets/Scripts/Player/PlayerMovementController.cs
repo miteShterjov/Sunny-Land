@@ -34,15 +34,16 @@ namespace Player
         private void Update()
         {
             if (isKnockedback) return;
-            
-            HandleWallSlide();
 
-            if (!collisionController.IsGrounded) return;
-
+            // Always read input first — no state should depend on stale values
             moveInput = inputHandler.GetMoveInput();
             isSprintingPressed = inputHandler.IsSprintPressed();
 
-            HandleMovement(moveInput);
+            HandleWallSlide();
+            HandleMovement(moveInput);       // BUG 1 FIX: runs regardless of grounded state
+
+            if (!collisionController.IsGrounded) return;
+
             HandleSprinting(isSprintingPressed);
         }
 
@@ -61,10 +62,10 @@ namespace Player
 
         private void HandleSprinting(bool sprinting)
         {
-            bool canActuallySprint = sprinting && playerStats.CanSprint() && moveInput.x != 0; 
-        
+            bool canActuallySprint = sprinting && playerStats.CanSprint() && moveInput.x != 0;
+
             playerStats.SpendStamina(canActuallySprint);
-        
+
             if (canActuallySprint)
             {
                 rb.linearVelocity = new Vector2(moveInput.x * moveSpeed * runMultiplier, rb.linearVelocity.y);

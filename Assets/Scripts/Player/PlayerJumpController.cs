@@ -13,11 +13,11 @@ namespace Player
         [SerializeField] private float doubleJumpForce = 10f;
         [SerializeField] private float jumpStaminaCost = 5f;
         [SerializeField] private Vector2 wallJumpForce;
-        [SerializeField] private bool canDoubleJump = true;
+        // [SerializeField] private bool canDoubleJump = true;
 
         private bool isGrounded;
-        private bool jumpIsPressed;
-
+        private bool hasDoubleJump;
+        private bool wasJumpPressedLastFrame;
         private Rigidbody2D rb;
         private PlayerData playerStats;
         private PlayerCollisionController collisionController;
@@ -34,23 +34,30 @@ namespace Player
         private void Update()
         {
             isGrounded = collisionController.IsGrounded;
-            jumpIsPressed = inputHandler.IsJumpPressed();
+            bool jumpPressedThisFrame = inputHandler.IsJumpPressed();
+
+            // BUG 2 FIX: only act on the frame the button is first pressed
+            bool jumpTriggered = jumpPressedThisFrame && !wasJumpPressedLastFrame;
+            wasJumpPressedLastFrame = jumpPressedThisFrame;
+
+            // BUG 3 FIX: restore double jump clearly when landing
+            if (isGrounded) hasDoubleJump = true;
 
             if (playerStats.CurrentStamina <= 0) return;
-            if (isGrounded && !canDoubleJump) ResetDoubleJump();
+            if (!jumpTriggered) return;
 
-            switch (jumpIsPressed)
+            if (isGrounded)
             {
-                case true when isGrounded:
-                    Jump(jumpForce);
-                    break;
-                case true when collisionController.IsTouchingWall && !isGrounded:
-                    WallJump();
-                    break;
-                case true when !isGrounded && canDoubleJump:
-                    Jump(doubleJumpForce);
-                    canDoubleJump = false;
-                    break;
+                Jump(jumpForce);
+            }
+            else if (collisionController.IsTouchingWall)
+            {
+                WallJump();     // BUG 4 PARTIAL FIX: jump controller owns this decision
+            }
+            else if (hasDoubleJump)
+            {
+                Jump(doubleJumpForce);
+                hasDoubleJump = false;
             }
         }
 
@@ -65,11 +72,10 @@ namespace Player
         {
             float xDir = collisionController.IsWallRight ? -1f : 1f;
             rb.linearVelocity = new Vector2(wallJumpForce.x * xDir, wallJumpForce.y);
-            canDoubleJump = true;
+            hasDoubleJump = true;
             playerStats.SpendStamina(jumpStaminaCost);
         }
 
-        private void ResetDoubleJump() => canDoubleJump = true;
+        // private void ResetDoubleJump() => hasDoubleJump = true;
     }
 }
- 

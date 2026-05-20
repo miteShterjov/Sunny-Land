@@ -1,4 +1,5 @@
 using System.Collections;
+using Enemies;
 using Player;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Misc
     public class VFXs : MonoBehaviour
     {
         [Header("Flash VFX Settings")]
-        [SerializeField] private float flashDuration = 0.3f;
+        [SerializeField] public float flashDuration = 0.3f;
         [SerializeField] private Material flashMaterial;
         [SerializeField] private Material defaultMaterial;
         [Header("Fade VFX Settings")]
@@ -62,7 +63,7 @@ namespace Misc
             float directionX = source.position.x < target.position.x ? 1f : -1f;
             rb.AddForce(new Vector2(directionX * knockbackForce.x, knockbackForce.y), ForceMode2D.Impulse);
             
-            StartCoroutine(ClearKnockbackCo(movement));
+            StartCoroutine(ClearKnockbackCo(movement.gameObject));
         }
 
         public void EnemyKnockback(Transform source, Transform target, Rigidbody2D rb)
@@ -74,10 +75,17 @@ namespace Misc
             StartCoroutine(KnockbackDurationCo());
         }
 
-        private IEnumerator ClearKnockbackCo(PlayerMovementController movement)
+        private IEnumerator ClearKnockbackCo(GameObject movement)
         {
             yield return new WaitForSeconds(knockbackCooldown);
-            if (movement) movement.IsKnockedBack = false;
+            if (movement.gameObject.CompareTag("Player")) 
+            {
+                movement.gameObject.GetComponent<PlayerMovementController>().IsKnockedBack = false;
+            }
+            else if (movement.gameObject.CompareTag("Enemy"))
+            {
+                movement.gameObject.GetComponent<Enemy>().IsKnockback = false;
+            }
         }
 
         private IEnumerator KnockbackDurationCo()

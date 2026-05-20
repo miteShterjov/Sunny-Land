@@ -104,6 +104,18 @@ namespace Player
             spendStamina = false;
         }
 
+        public void RecoverStamina(float value)
+        {
+            if (value < 0) return; // Prevent negative stamina recovery
+
+            currentStamina += value;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+            OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+
+            if (!(currentStamina >= staminaThreshold) || !IsStaminaExhausted) return;
+            IsStaminaExhausted = false;
+        }
+
         public bool CanSprint() => !IsStaminaExhausted && currentStamina > 0;
 
         public void ResetPlayerStats()

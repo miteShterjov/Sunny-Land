@@ -7,5 +7,6 @@ namespace Misc
         [SerializeField] private float delay = 0f;
 
         public void DestroyObject() => Destroy(gameObject, delay);
+        public void DestroyParent() => Destroy(transform.parent.gameObject, delay);
     }
 }

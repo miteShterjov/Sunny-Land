@@ -1,84 +1,70 @@
-using System;
 using System.Collections;
-using Enemies;
 using Misc;
-using Unity.VisualScripting;
+using Player;
 using UnityEngine;
 
-[RequireComponent(typeof(VFXs))]
-public class OpossumEnemy : Enemy
+namespace Enemies
 {
-    [Header("Opossum Specific")]
-    [Header("Charge Settings")]
-    [SerializeField] private float chargeSpeed;
-    [SerializeField] private float chargeDuration;
-    [SerializeField] private TrailRenderer chargeTrail;
-    [Header("Knockback Settings")]
-    [SerializeField] private float knockbackForce;
-    [SerializeField] private float knockbackDuration;
-    [SerializeField] private bool isKnockbacked;
-    [SerializeField] private bool isAttacking;
-
-    private bool playerWasHit;
-    private VFXs visuals;
-
-    protected override void Awake()
+    [RequireComponent(typeof(VFXs))]
+    public class OpossumEnemy : Enemy
     {
-        base.Awake();
-        visuals = GetComponent<VFXs>();
-    }
+        [Header("Charge Settings")]
+        [SerializeField] private float chargeSpeed;
+        [SerializeField] private TrailRenderer chargeTrail;
+        [SerializeField] private bool isAttacking;
+        [SerializeField] private float damageAmount = 25f;
 
-    protected override void HandleAttackState()
-    {
-        // Opossum specific attack behavior
-        // it will do a quick dash towards the player and then be knocked back for a short distance,
-        // after the knockback it will be immobile(dazed like) for a short time and then it will be able 
-        // to attack again
-        if (!isAttacking) StartCoroutine(AttackSequenceCo());
-    }
+        private static readonly int EnemeyDeathAnimParam = Animator.StringToHash("isDead");
 
-    private IEnumerator AttackSequenceCo()
-    {
-        isAttacking = true;
+        private VFXs visuals;
 
-        yield return StartCoroutine(ChargeCo());
-        yield return StartCoroutine(KnockbackCo());
-    
-    }
-
-    private IEnumerator ChargeCo()
-    {
-        float elapsedTime = 0f;
-        playerWasHit = false;
-
-        rb.linearVelocity = new Vector2(facingDir * chargeSpeed, rb.linearVelocity.y);
-        chargeTrail.emitting = true;
-
-        while(!playerWasHit && elapsedTime < chargeDuration)
+        protected override void Awake()
         {
-            elapsedTime += Time.deltaTime;
-            yield return null;
+            base.Awake();
+            visuals = GetComponent<VFXs>();
         }
-        rb.linearVelocity = Vector2.zero;
-        chargeTrail.emitting = false;
-    }
 
-    private IEnumerator KnockbackCo()
-    {
-        visuals.EnemyKnockback(transform, GameObject.FindGameObjectWithTag("Player").transform, rb);
+        protected override void HandleDetectionAndStateTransitions()
+        {
+            if (isAttacking) return;
+            base.HandleDetectionAndStateTransitions();
+        }
 
-        // CONTINUE FROM HERE
-        // finish knockback and move on to the next sequence 
+        protected override void HandleAttackState()
+        {
+            if (!isAttacking)
+            {
+                DoAttackSequence();
+                isAttacking = true;
+            }
+        }
 
+        private void DoAttackSequence()
+        {
+            // face player before charging if in range
+            if (playerTransform)
+            {
+                int dirToPlayer = playerTransform.position.x > transform.position.x ? 1 : -1;
+                if (dirToPlayer != facingDir) Flip();
+            }
 
-        yield return new WaitForSeconds(knockbackDuration);
-    }
+            chargeTrail.emitting = true;
+            rb.linearVelocity = new Vector2(facingDir * chargeSpeed, rb.linearVelocity.y);
+        }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (!collision.gameObject.CompareTag("Player")) return;
-        playerWasHit = true;
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (!collision.gameObject.CompareTag("Player")) return;
+            PlayerHealthController player = collision.gameObject.GetComponent<PlayerHealthController>();
+
+            rb.linearVelocity = Vector2.zero;
+            chargeTrail.emitting = false;
+
+            // visuals.Fade();
+            // visuals.FlashVFX();
+            // visuals.EnemyKnockback(transform, playerTransform, rb);
+            player.Damage(transform, damageAmount);
+            animator.SetTrigger(EnemeyDeathAnimParam);
+        }
     }
 }
-
-
