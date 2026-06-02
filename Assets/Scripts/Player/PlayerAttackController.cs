@@ -1,4 +1,4 @@
-using System;
+using SpecialAttacks;
 using UnityEngine;
 
 namespace Player
@@ -11,7 +11,7 @@ namespace Player
 
         private PlayerData playerData;
 
-        void Awake()
+        private void Awake()
         {
             playerData = GetComponent<PlayerData>();
         }
@@ -24,10 +24,10 @@ namespace Player
 
         public void SpecialAttack()
         {
-            float magikaCost = fireballPrefab.GetComponent<Fireball>().MagikaCost;
-            if (playerData.CurrentMagika < magikaCost) return;
+            float manaCost = fireballPrefab.GetComponent<Fireball>().ManaCost;
+            if (playerData.CurrentMana < manaCost) return;
             
-            playerData.CurrentMagika -= magikaCost;
+            playerData.CurrentMana -= manaCost;
             Instantiate(fireballPrefab, transform.position + transform.forward, Quaternion.identity);
         }
     }

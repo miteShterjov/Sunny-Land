@@ -7,19 +7,19 @@ namespace Player
     {
         public static event Action<float, float> OnStaminaChanged;
         public static event Action<int, int> OnLivesChanged;
-        public static event Action<float, float> OnMagikaChanged;
+        public static event Action<float, float> OnManaChanged;
 
         [Header("Player Stats")]
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float maxStamina = 100f;
-        [SerializeField] private float maxMagika = 100f;
+        [SerializeField] private float maxMana = 100f;
         [SerializeField] private float staminaDepletionRate = 2f;
         [SerializeField] private float staminaRecoveryRate = 5f;
         [SerializeField] private float staminaThreshold = 10f;
-        [SerializeField] private float magikaRecoveryRate = 2.5f;
+        [SerializeField] private float manaRecoveryRate = 2.5f;
         [SerializeField] private float currentHealth;
         [SerializeField] private float currentStamina;
-        [SerializeField] private float currentMagika;
+        [SerializeField] private float currentMana;
         [SerializeField] private bool spendStamina;
         [SerializeField] private int maxLives = 3;
         [SerializeField] private int currentLives = 3;
@@ -28,20 +28,20 @@ namespace Player
         {
             currentHealth = maxHealth;
             currentStamina = maxStamina;
-            currentMagika = maxMagika;
+            currentMana = maxMana;
         }
 
         private void Start()
         {
             OnStaminaChanged?.Invoke(currentStamina, maxStamina);
             OnLivesChanged?.Invoke(currentLives, maxLives);
-            OnMagikaChanged?.Invoke(currentMagika, maxMagika);
+            OnManaChanged?.Invoke(currentMana, maxMana);
         }
 
         private void FixedUpdate()
         {
             HandleStamina();
-            HandleMagika();
+            HandleMana();
             OnStaminaChanged?.Invoke(currentStamina, maxStamina);
         }
 
@@ -57,13 +57,13 @@ namespace Player
             set => currentStamina = Mathf.Clamp(value, 0, maxStamina);
         }
 
-        public float CurrentMagika
+        public float CurrentMana
         {
-            get => currentMagika;
+            get => currentMana;
             set
             {
-                currentMagika = Mathf.Clamp(value, 0, maxMagika);
-                OnMagikaChanged?.Invoke(currentMagika, maxMagika);
+                currentMana = Mathf.Clamp(value, 0, maxMana);
+                OnManaChanged?.Invoke(currentMana, maxMana);
             }
         }
 
@@ -76,7 +76,7 @@ namespace Player
         public float MaxHealth => maxHealth;
 
         public float MaxStamina => maxStamina;
-        public float MaxMagika => maxMagika;
+        public float MaxMana => maxMana;
         public int MaxLives => maxLives;
 
         public void SpendStamina(bool spend)
@@ -175,12 +175,12 @@ namespace Player
             }
         }
 
-        private void HandleMagika()
+        private void HandleMana()
         {
-            if (CurrentMagika < maxMagika)
+            if (CurrentMana < maxMana)
             {
-                CurrentMagika += magikaRecoveryRate * Time.fixedDeltaTime;
-                CurrentMagika = Mathf.Clamp(CurrentMagika, 0, maxMagika);
+                CurrentMana += manaRecoveryRate * Time.fixedDeltaTime;
+                CurrentMana = Mathf.Clamp(CurrentMana, 0, maxMana);
             }
         }
     }

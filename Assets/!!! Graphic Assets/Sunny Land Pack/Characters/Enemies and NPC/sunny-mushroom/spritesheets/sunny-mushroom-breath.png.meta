@@ -82,7 +82,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -96,7 +96,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -120,7 +120,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -174,12 +174,12 @@ TextureImporter:
       name: sunny-mushroom-breath_0
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 0
-        width: 25
-        height: 27
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.41077647}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -196,12 +196,12 @@ TextureImporter:
       name: sunny-mushroom-breath_1
       rect:
         serializedVersion: 2
-        x: 68
+        x: 63
         y: 0
-        width: 25
-        height: 27
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -218,12 +218,12 @@ TextureImporter:
       name: sunny-mushroom-breath_2
       rect:
         serializedVersion: 2
-        x: 133
+        x: 126
         y: 0
-        width: 32
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -240,12 +240,12 @@ TextureImporter:
       name: sunny-mushroom-breath_3
       rect:
         serializedVersion: 2
-        x: 195
+        x: 189
         y: 0
-        width: 37
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -262,12 +262,12 @@ TextureImporter:
       name: sunny-mushroom-breath_4
       rect:
         serializedVersion: 2
-        x: 259
+        x: 252
         y: 0
-        width: 42
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -284,12 +284,12 @@ TextureImporter:
       name: sunny-mushroom-breath_5
       rect:
         serializedVersion: 2
-        x: 321
+        x: 315
         y: 0
-        width: 47
-        height: 25
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -306,12 +306,12 @@ TextureImporter:
       name: sunny-mushroom-breath_6
       rect:
         serializedVersion: 2
-        x: 385
+        x: 378
         y: 0
-        width: 32
-        height: 26
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -328,12 +328,12 @@ TextureImporter:
       name: sunny-mushroom-breath_7
       rect:
         serializedVersion: 2
-        x: 416
-        y: 15
-        width: 14
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 441
+        y: 0
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -350,12 +350,12 @@ TextureImporter:
       name: sunny-mushroom-breath_8
       rect:
         serializedVersion: 2
-        x: 447
+        x: 504
         y: 0
-        width: 25
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -372,12 +372,12 @@ TextureImporter:
       name: sunny-mushroom-breath_9
       rect:
         serializedVersion: 2
-        x: 472
-        y: 17
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 567
+        y: 0
+        width: 63
+        height: 37
+      alignment: 9
+      pivot: {x: 0.3066325, y: 0.4107765}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -390,143 +390,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: sunny-mushroom-breath_10
-      rect:
-        serializedVersion: 2
-        x: 483
-        y: 19
-        width: 7
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 96e268e5fa55f4780800000000000000
-      internalID: -8696638143735648663
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sunny-mushroom-breath_11
-      rect:
-        serializedVersion: 2
-        x: 511
-        y: 0
-        width: 25
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7cad9b50676e15280800000000000000
-      internalID: -9056203981088761145
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sunny-mushroom-breath_12
-      rect:
-        serializedVersion: 2
-        x: 573
-        y: 0
-        width: 25
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d3b072624dcc57d30800000000000000
-      internalID: 4428671020133976893
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sunny-mushroom-breath_13
-      rect:
-        serializedVersion: 2
-        x: 416
-        y: 7
-        width: 11
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 4df80f0f1c55a50e0800000000000000
-      internalID: -2280415969850388524
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sunny-mushroom-breath_14
-      rect:
-        serializedVersion: 2
-        x: 472
-        y: 8
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: de1285819e6dd8380800000000000000
-      internalID: -8967274986400636435
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sunny-mushroom-breath_15
-      rect:
-        serializedVersion: 2
-        x: 482
-        y: 11
-        width: 6
-        height: 7
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 8e7793c3cc7dfefd0800000000000000
-      internalID: -2310390811634075672
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: f25c1e7df40e0b6a8a9a2119910b73db
     internalID: 0
     vertices: []
     indices: 
@@ -534,16 +402,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":63.0,"y":37.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       sunny-mushroom-breath_0: 1975693124345049789
       sunny-mushroom-breath_1: 9102329319956925530
-      sunny-mushroom-breath_10: -8696638143735648663
-      sunny-mushroom-breath_11: -9056203981088761145
-      sunny-mushroom-breath_12: 4428671020133976893
-      sunny-mushroom-breath_13: -2280415969850388524
-      sunny-mushroom-breath_14: -8967274986400636435
-      sunny-mushroom-breath_15: -2310390811634075672
       sunny-mushroom-breath_2: 1251941718140490698
       sunny-mushroom-breath_3: -8133152458743773106
       sunny-mushroom-breath_4: -7231854516620059428

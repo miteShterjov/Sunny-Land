@@ -1,17 +1,27 @@
 using System.Collections;
+using LevelMech;
 using Misc;
 using Player;
+using ScriptableObjects;
 using UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 namespace Managers
 {
     public class GameManager : Singleton<GameManager>
     {
+        public LevelCollection LevelsCollection { get => levelsCollection; set => levelsCollection = value;}
+        
+        private static readonly WaitForSecondsRealtime WaitFor1SecRealtime = new WaitForSecondsRealtime(1f);
         [Header("Player Stats")]
         [SerializeField] private int gemsCollected;
         [Header("Game Prefs")]
         [SerializeField] private bool isGameOver;
+        [Header("Levels Collection")] 
+        [SerializeField] private LevelCollection levelsCollection;
+        
         
         public bool IsGameOver => isGameOver;
 
@@ -29,12 +39,36 @@ namespace Managers
             if (!fadeUI) Debug.LogError("Fade UI not found by Game Manager.");
         }
 
-        private void OnEnable() => PlayerData.OnLivesChanged += IsTheGameOver;
-        private void OnDisable() => PlayerData.OnLivesChanged -= IsTheGameOver;
+        private void OnEnable()
+        {
+            PlayerData.OnLivesChanged += IsTheGameOver;
+            FlagPole.OnLevelFinished += OnLevelFinished;
+        }
+
+        private void OnDisable()
+        {
+            PlayerData.OnLivesChanged -= IsTheGameOver;
+            FlagPole.OnLevelFinished -= OnLevelFinished;
+        } 
 
         public int GemsCollected { set => gemsCollected = value; get => gemsCollected; }
 
         public void OnPlayerDeath() => StartCoroutine(PlayerRespawnSequence());
+
+        public void OnLevelFinished() => StartCoroutine(DoLevelSwichCo());
+
+        private IEnumerator DoLevelSwichCo()
+        {
+            //pause game->fade out->load overworld->fade in->resume game
+            //call method in gameprogressmanager to load next level
+            //in same method we need to pass info about current level
+            Time.timeScale = 0f;
+            fadeUI.FadeToBlack();
+            yield return WaitFor1SecRealtime;
+            fadeUI.FadeToClear();
+            Time.timeScale = 1f;
+            SceneManager.LoadScene("Overworld", LoadSceneMode.Single);
+        }
     
         private IEnumerator PlayerRespawnSequence()
         {
@@ -43,7 +77,7 @@ namespace Managers
             // Careful when changing anything related to player death and respawn.
             Time.timeScale = 0f;
             fadeUI.FadeToBlack();
-            yield return new WaitForSecondsRealtime(1f);
+            yield return WaitFor1SecRealtime;
             player.ResetPlayerStats();
             player.transform.position = respawnManager.GetCurrentRespawnPoint();
             fadeUI.FadeToClear();

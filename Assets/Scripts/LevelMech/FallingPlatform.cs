@@ -1,41 +1,38 @@
 using UnityEngine;
 
-public class FallingPlatform : MonoBehaviour
+namespace LevelMech
 {
-    public float fallDelay = 1f; 
-    public float resetDelay = 5f; 
-    private Vector3 initialPosition;
-    private Quaternion initialRotation;
-    private Rigidbody2D rb;
-
-    void Start()
+    public class FallingPlatform : MonoBehaviour
     {
-        initialPosition = transform.position;
-        initialRotation = transform.rotation;
-        rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Static; // Make the platform static at the start
-    }
+        public float fallDelay = 1f; 
+        public float resetDelay = 5f; 
+        private Vector3 initialPosition;
+        private Quaternion initialRotation;
+        private Rigidbody2D rb;
 
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
+        private void Start()
         {
-            Invoke("Fall", fallDelay);
-            Invoke("ResetPlatform", fallDelay + resetDelay);
+            initialPosition = transform.position;
+            initialRotation = transform.rotation;
+            rb = GetComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Static; // Make the platform static at the start
         }
-    }
 
-    void Fall()
-    {
-        rb.bodyType = RigidbodyType2D.Dynamic;
-    }
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (!collision.gameObject.CompareTag("Player")) return;
+            Invoke(nameof(Fall), fallDelay);
+            Invoke(nameof(ResetPlatform), fallDelay + resetDelay);
+        }
 
-    void ResetPlatform()
-    {
-        transform.position = initialPosition; // Reset position
-        transform.rotation = initialRotation; // Reset rotation
-        rb.linearVelocity = Vector2.zero; // Reset velocity
-        rb.angularVelocity = 0f; // Reset angular velocity
-        rb.bodyType = RigidbodyType2D.Static; // Make the platform static again
+        private void Fall() => rb.bodyType = RigidbodyType2D.Dynamic;
+
+        private void ResetPlatform()
+        {
+            transform.SetPositionAndRotation(initialPosition, initialRotation);
+            rb.linearVelocity = Vector2.zero; // Reset velocity
+            rb.angularVelocity = 0f; // Reset angular velocity
+            rb.bodyType = RigidbodyType2D.Static; // Make the platform static again
+        }
     }
 }

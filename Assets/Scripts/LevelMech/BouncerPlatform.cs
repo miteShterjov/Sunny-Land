@@ -1,46 +1,49 @@
 using System.Collections;
 using UnityEngine;
 
-public class BouncerPlatform : MonoBehaviour
+namespace LevelMech
 {
-    [SerializeField] private float bounceForce = 10f;
-    [SerializeField] private float bounceDuration = 0.5f;
-    [SerializeField] private Sprite bouncedSprite;
-
-    private Sprite originalSprite;
-    private SpriteRenderer spriteRenderer;
-    private bool canBounce = true;
-
-    private void Awake()
+    public class BouncerPlatform : MonoBehaviour
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
+        [SerializeField] private float bounceForce = 10f;
+        [SerializeField] private float bounceDuration = 0.5f;
+        [SerializeField] private Sprite bouncedSprite;
 
-    private void Start()
-    {
-        originalSprite = spriteRenderer.sprite;
-    }
+        private Sprite originalSprite;
+        private SpriteRenderer spriteRenderer;
+        private bool canBounce = true;
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other.gameObject.CompareTag("Player")) return;
-        if (!canBounce) return;
+        private void Awake()
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
 
-        Rigidbody2D playerRb = other.gameObject.GetComponent<Rigidbody2D>();
+        private void Start()
+        {
+            originalSprite = spriteRenderer.sprite;
+        }
 
-        if (!playerRb) return;
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!other.gameObject.CompareTag("Player")) return;
+            if (!canBounce) return;
 
-        Vector2 bounceDirection = Vector2.up; // Bounce upwards
-        playerRb.AddForce(bounceDirection * bounceForce, ForceMode2D.Impulse);
-        StartCoroutine(BounceEffect());
-    }
+            Rigidbody2D playerRb = other.gameObject.GetComponent<Rigidbody2D>();
+
+            if (!playerRb) return;
+
+            Vector2 bounceDirection = Vector2.up; // Bounce upwards
+            playerRb.AddForce(bounceDirection * bounceForce, ForceMode2D.Impulse);
+            StartCoroutine(BounceEffect());
+        }
     
-    private IEnumerator BounceEffect()
-    {
-        canBounce = false;
-        spriteRenderer.sprite = bouncedSprite;
-        yield return new WaitForSeconds(bounceDuration);
-        spriteRenderer.sprite = originalSprite;
-        canBounce = true;
+        private IEnumerator BounceEffect()
+        {
+            canBounce = false;
+            spriteRenderer.sprite = bouncedSprite;
+            yield return new WaitForSeconds(bounceDuration);
+            spriteRenderer.sprite = originalSprite;
+            canBounce = true;
+        }
     }
 }

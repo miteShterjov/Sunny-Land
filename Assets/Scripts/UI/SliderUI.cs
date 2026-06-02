@@ -12,48 +12,48 @@ namespace UI
         [Header("Stamina Slider")]
         [SerializeField] private Image middleStaminaFill;
         [SerializeField] private Image staminaFill;
-        [Header("Magika Slider")]
-        [SerializeField] private Image middleMagikaFill;
-        [SerializeField] private Image magikaFill;
+        [Header("Mana Slider")]
+        [SerializeField] private Image middleManaFill;
+        [SerializeField] private Image ManaFill;
         [Header("Speed Settings")]
         [SerializeField] private float frontSpeedFill = 5f;
         [SerializeField] private float middleSpeedFill = 2.5f;
         
         private float targetHealthFill;
         private float targetStaminaFill;
-        private float targetMagikaFill;
+        private float targetManaFill;
         private void OnEnable()
         {
             PlayerHealthController.OnHealthChanged += UpdateHealthSlider;
             PlayerData.OnStaminaChanged += UpdateStaminaSlider;
-            PlayerData.OnMagikaChanged += UpdateMagikaSlider;
+            PlayerData.OnManaChanged += UpdateManaSlider;
         }
 
         private void OnDisable()
         {
             PlayerHealthController.OnHealthChanged -= UpdateHealthSlider;
             PlayerData.OnStaminaChanged -= UpdateStaminaSlider;
-            PlayerData.OnMagikaChanged -= UpdateMagikaSlider;
+            PlayerData.OnManaChanged -= UpdateManaSlider;
         }
 
         private void Update()
         {
             UpdateHealthBar();
             UpdateStaminaBar();
-            UpdateMagikaBar();
+            UpdateManaBar();
         }
 
-        private void UpdateMagikaBar()
+        private void UpdateManaBar()
         {
-            if (targetMagikaFill < magikaFill.fillAmount)
+            if (targetManaFill < ManaFill.fillAmount)
             {
-                magikaFill.fillAmount = Mathf.MoveTowards(magikaFill.fillAmount, targetMagikaFill, frontSpeedFill * Time.deltaTime);
-                middleMagikaFill.fillAmount = Mathf.MoveTowards(middleMagikaFill.fillAmount, targetMagikaFill, middleSpeedFill * Time.deltaTime);
+                ManaFill.fillAmount = Mathf.MoveTowards(ManaFill.fillAmount, targetManaFill, frontSpeedFill * Time.deltaTime);
+                middleManaFill.fillAmount = Mathf.MoveTowards(middleManaFill.fillAmount, targetManaFill, middleSpeedFill * Time.deltaTime);
             }
             else
             {
-                magikaFill.fillAmount = Mathf.MoveTowards(magikaFill.fillAmount, targetMagikaFill, middleSpeedFill * Time.deltaTime);
-                middleMagikaFill.fillAmount = Mathf.MoveTowards(middleMagikaFill.fillAmount, targetMagikaFill, frontSpeedFill * Time.deltaTime);
+                ManaFill.fillAmount = Mathf.MoveTowards(ManaFill.fillAmount, targetManaFill, middleSpeedFill * Time.deltaTime);
+                middleManaFill.fillAmount = Mathf.MoveTowards(middleManaFill.fillAmount, targetManaFill, frontSpeedFill * Time.deltaTime);
             }    
         }
 
@@ -89,6 +89,6 @@ namespace UI
         
         private void UpdateStaminaSlider(float current, float max) => targetStaminaFill = max > 0 ? current / max : 0f;
 
-        private void UpdateMagikaSlider(float current, float max) => targetMagikaFill = max > 0 ? current / max : 0f;
+        private void UpdateManaSlider(float current, float max) => targetManaFill = max > 0 ? current / max : 0f;
     }
 }

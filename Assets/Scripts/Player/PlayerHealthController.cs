@@ -35,7 +35,6 @@ namespace Player
 
         private void Start()
         {
-            print("Player initialized: " + playerStats.CurrentHealth + " health, " + playerStats.MaxHealth + " max health.");
             OnHealthChanged?.Invoke(playerStats.CurrentHealth, playerStats.MaxHealth);
         }
 

@@ -7,7 +7,6 @@ namespace Player
     {
         [Header("Input References")]
         [SerializeField] private Vector2 moveInput;
-        [SerializeField] private bool playerSprintIsPressed;
         [SerializeField] private bool jumpPressed;
     
         private InputSystem_Actions inputActions;
@@ -22,8 +21,6 @@ namespace Player
             inputActions.Player.Enable();
             inputActions.Player.Move.performed += HandleMoveInput;
             inputActions.Player.Move.canceled += HandleMoveInputCanceled;
-            inputActions.Player.Sprint.performed += HandleSprintInput;
-            inputActions.Player.Sprint.canceled += HandleSprintInputCanceled;
             inputActions.Player.Jump.performed += HandleJumpInput;
             inputActions.Player.Jump.canceled += HandleJumpInputCanceled;
             inputActions.Player.Attack.performed += HandleAttackInput;            
@@ -33,16 +30,18 @@ namespace Player
         {
             inputActions.Player.Move.performed -= HandleMoveInput;
             inputActions.Player.Move.canceled -= HandleMoveInputCanceled;
-            inputActions.Player.Sprint.performed -= HandleSprintInput;
-            inputActions.Player.Sprint.canceled -= HandleSprintInputCanceled;
             inputActions.Player.Jump.performed -= HandleJumpInput;
             inputActions.Player.Jump.canceled -= HandleJumpInputCanceled;
             inputActions.Player.Attack.performed -= HandleAttackInput;
             inputActions.Player.Disable();
         }
         
+        public float GetClimbInput() => 
+            Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1f :
+            Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1f : 0f;
+        
         public Vector2 GetMoveInput() => moveInput;
-        public bool IsSprintPressed() => playerSprintIsPressed;
+        public bool IsSprintPressed() => inputActions.Player.Sprint.IsPressed();
         public bool IsJumpPressed()
         {
             if (!jumpPressed) return false;
@@ -58,16 +57,6 @@ namespace Player
         private void HandleMoveInputCanceled(InputAction.CallbackContext context)
         {
             moveInput = Vector2.zero;
-        }
-
-        private void HandleSprintInput(InputAction.CallbackContext context)
-        {
-            playerSprintIsPressed = true;
-        }
-
-        private void HandleSprintInputCanceled(InputAction.CallbackContext context)
-        {
-            playerSprintIsPressed = false;
         }
 
         private void HandleJumpInput(InputAction.CallbackContext context)

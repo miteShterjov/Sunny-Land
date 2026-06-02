@@ -15,6 +15,7 @@ namespace Player
         [SerializeField] private bool isGrounded;
         [SerializeField] private bool isWallLeft;
         [SerializeField] private bool isWallRight;
+        [SerializeField] private bool isOnStairs;
     
         private CapsuleCollider2D capsuleCollider;
 
@@ -29,6 +30,7 @@ namespace Player
             UpdateWallDetection();
         }
         
+        public bool IsOnStairs { get => isOnStairs; private set => isOnStairs = value;}
         public bool IsGrounded => isGrounded;
         public bool IsWallLeft => isWallLeft;
         public bool IsWallRight => isWallRight;
@@ -53,6 +55,16 @@ namespace Player
             // Raycast right from collider center
             RaycastHit2D rightHit = Physics2D.Raycast(raycastOrigin, Vector2.right, wallCheckDistance, wallLayer);
             isWallRight = rightHit.collider;
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Stairs")) IsOnStairs = true;
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Stairs")) IsOnStairs = false;
         }
 
         private void OnDrawGizmos()

@@ -1,3 +1,5 @@
+using System;
+using Enemies;
 using UnityEngine;
 
 namespace Player
@@ -61,6 +63,8 @@ namespace Player
             }
         }
 
+        private void OnEnable() => Enemy.OnEnemyStomped += BounceOffEnemy;
+
         private void Jump(float force)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
@@ -75,6 +79,8 @@ namespace Player
             hasDoubleJump = true;
             playerStats.SpendStamina(jumpStaminaCost);
         }
+        
+        private void BounceOffEnemy() => rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
 
         // private void ResetDoubleJump() => hasDoubleJump = true;
     }

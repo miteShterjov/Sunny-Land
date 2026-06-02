@@ -22,6 +22,7 @@ namespace Player
         private static readonly int IsGroundedAnimParam = Animator.StringToHash("isGrounded");
         private static readonly int WallGrabParam = Animator.StringToHash("wallDetected");
         private static readonly int HurtAnimParam = Animator.StringToHash("isHurt");
+        private static readonly int IsOnStairsAnimParam = Animator.StringToHash("isOnStairs");
 
         private void Awake()
         {
@@ -33,16 +34,21 @@ namespace Player
         private void Update()
         {
             isGrounded = collisionController.IsGrounded;
-            xVelocity = rb.linearVelocity.x;
-            yVelocity = rb.linearVelocity.y;
-
+            
             animator.SetBool(IsGroundedAnimParam, isGrounded);
 
-            HandleWallGrabAnimEvent();
+            if (!collisionController.IsOnStairs) HandleWallGrabAnimEvent();
             HandleMovingAnimEvent();
             HandleJumpingAnimEvent();
             if (!collisionController.IsTouchingWall || isGrounded) HandleFacingDirection(xVelocity);
             HandleHurtAnimEvent(isHurt);
+            HandleClimbStairsAnimEvent();
+        }
+
+        private void FixedUpdate()
+        {
+            xVelocity = rb.linearVelocity.x;
+            yVelocity = rb.linearVelocity.y;
         }
 
         private void OnEnable() => PlayerHealthController.OnInvincibilityChanged += PlayerIsHurt;
@@ -83,5 +89,7 @@ namespace Player
         }
 
         private void HandleHurtAnimEvent(bool isInvincible) => animator.SetBool(HurtAnimParam, isInvincible);
+        
+        private void HandleClimbStairsAnimEvent() => animator.SetBool(IsOnStairsAnimParam, collisionController.IsOnStairs && yVelocity != 0);
     }
 }

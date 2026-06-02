@@ -7,5 +7,9 @@ AnimatorOverrideController:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Acorn
-  m_Controller: {fileID: 0}
-  m_Clips: []
+  m_Controller: {fileID: 9100000, guid: f84998ffa46d3207e9092cb96ac63bc8, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: fd65c3721343223b0845496074a40c17, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: fd65c3721343223b0845496074a40c17, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 2251f958fb0bb4037b8dff154d014ed7, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 683c05c7213ea1376a5355b1052cda5c, type: 2}

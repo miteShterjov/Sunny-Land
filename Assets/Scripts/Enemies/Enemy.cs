@@ -1,13 +1,18 @@
+using System;
 using System.Collections;
+using LevelMech;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Enemies
 {
-    [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(LootDropHandler))]
     public abstract class Enemy : MonoBehaviour
     {
         public bool IsKnockback { get => isKnockback; set => isKnockback = value; }
+        
+        public static event Action OnEnemyStomped;
 
         [Header("Stats")]
         [SerializeField] protected float maxHealth;
@@ -48,6 +53,7 @@ namespace Enemies
         private bool isWaitingAtPatrolPoint;
 
         private static readonly int MoveAnimParam = Animator.StringToHash("xVelocity");
+        private static readonly int IsDeadAnimParam = Animator.StringToHash("isDead");
 
         protected virtual void Awake()
         {
@@ -59,6 +65,21 @@ namespace Enemies
 
         protected virtual void Start()
         {
+            // Ignore collisions between all enemies
+            // weird bug i cant fix so in the end it had to be fix like this
+            foreach (var other in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            {
+                if (other == this) continue;
+        
+                var myColliders = GetComponents<Collider2D>();
+                var otherColliders = other.GetComponents<Collider2D>();
+        
+                foreach (var col1 in myColliders)
+                foreach (var col2 in otherColliders)
+                    Physics2D.IgnoreCollision(col1, col2, true);
+            }
+            
+            
             startingPosition = transform.position;
             HandlePatrolPointsToVector3();
             facingDir = isTurnedRight ? 1 : -1;
@@ -165,7 +186,13 @@ namespace Enemies
         }
 
         protected virtual void HandleAttackState() { }
-        protected virtual void HandleDeadState() { }
+
+        protected virtual void HandleDeadState()
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            GetComponent<LootDropHandler>().DropLoot();
+        }
 
         protected virtual void HandlePatrolPointsToVector3()
         {
@@ -240,6 +267,14 @@ namespace Enemies
             isWaitingAtPatrolPoint = false;
             HandleStateMachine(EnemyState.Patrol);
             Flip();
+        }
+
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if (!other.gameObject.CompareTag("Player")) return;
+            OnEnemyStomped?.Invoke();
+            TakeDamage(currentHealth);
+            animator.SetBool(IsDeadAnimParam, true);
         }
 
         public virtual void TakeDamage(float damage)

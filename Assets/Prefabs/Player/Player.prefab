@@ -121,11 +121,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   maxHealth: 100
   maxStamina: 100
+  maxMana: 100
   staminaDepletionRate: 2
-  staminaRecoveryRate: 5
+  staminaRecoveryRate: 2
   staminaThreshold: 10
+  manaRecoveryRate: 2.5
   currentHealth: 0
   currentStamina: 0
+  currentMana: 0
   spendStamina: 0
   maxLives: 3
   currentLives: 3
@@ -188,7 +191,6 @@ MonoBehaviour:
   doubleJumpForce: 5
   jumpStaminaCost: 5
   wallJumpForce: {x: 3, y: 5}
-  canDoubleJump: 1
 --- !u!114 &6625705762981822970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,7 +206,7 @@ MonoBehaviour:
   groundCheckDistance: 0.4
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 576
   wallCheckDistance: 1
   wallLayer:
     serializedVersion: 2
@@ -224,6 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b7d3df080201ddefa30c192cc3d3aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttackController
+  fireballPrefab: {fileID: 8686810600972958485, guid: d4273a3e2d7750772a4522867a1ffb8d, type: 3}
 --- !u!114 &1063549343422003130
 MonoBehaviour:
   m_ObjectHideFlags: 0

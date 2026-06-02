@@ -1,4 +1,4 @@
-using System.Collections;
+using LevelMech;
 using Misc;
 using Player;
 using UnityEngine;
@@ -14,15 +14,7 @@ namespace Enemies
         [SerializeField] private bool isAttacking;
         [SerializeField] private float damageAmount = 25f;
 
-        private static readonly int EnemeyDeathAnimParam = Animator.StringToHash("isDead");
-
-        private VFXs visuals;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            visuals = GetComponent<VFXs>();
-        }
+        private static readonly int EnemyDeathAnimParam = Animator.StringToHash("isDead");
 
         protected override void HandleDetectionAndStateTransitions()
         {
@@ -60,11 +52,9 @@ namespace Enemies
             rb.linearVelocity = Vector2.zero;
             chargeTrail.emitting = false;
 
-            // visuals.Fade();
-            // visuals.FlashVFX();
-            // visuals.EnemyKnockback(transform, playerTransform, rb);
             player.Damage(transform, damageAmount);
-            animator.SetTrigger(EnemeyDeathAnimParam);
+            GetComponent<LootDropHandler>().DropLoot();
+            animator.SetTrigger(EnemyDeathAnimParam);
         }
     }
 }
