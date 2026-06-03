@@ -91,4 +91,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6f9e7bae6f3faf2badeabfd0a2b2792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeadZone
-  destroyDelay: 0
+  destroyDelay: 0.3

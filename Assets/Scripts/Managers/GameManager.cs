@@ -1,27 +1,27 @@
 using System.Collections;
 using LevelMech;
-using Misc;
 using Player;
 using ScriptableObjects;
 using UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 namespace Managers
 {
-    public class GameManager : Singleton<GameManager>
+    public class GameManager : Misc.Singleton<GameManager>
     {
         public LevelCollection LevelsCollection { get => levelsCollection; set => levelsCollection = value;}
         
         private static readonly WaitForSecondsRealtime WaitFor1SecRealtime = new WaitForSecondsRealtime(1f);
+        
         [Header("Player Stats")]
         [SerializeField] private int gemsCollected;
         [Header("Game Prefs")]
         [SerializeField] private bool isGameOver;
         [Header("Levels Collection")] 
         [SerializeField] private LevelCollection levelsCollection;
-        
         
         public bool IsGameOver => isGameOver;
 
@@ -31,12 +31,30 @@ namespace Managers
 
         private void Start()
         {
-            player = FindFirstObjectByType<PlayerData>();
-            if (!player) Debug.LogError("Player not found by Game Manager.");
-            respawnManager = CheckpointManager.Instance;
-            if (!respawnManager) Debug.LogError("Checkpoint Manager not found by Game Manager.");
+            levelsCollection = levelsCollection = Resources.Load<LevelCollection>("LevelCollection");
+            
+            if (SceneManager.GetActiveScene().name == "Overworld")
+            {
+                respawnManager = null;
+                player = null;
+            }
+            else
+            {
+                player = FindFirstObjectByType<PlayerData>();
+                if (!player) Debug.LogError("Player not found by Game Manager.");
+                respawnManager = FindFirstObjectByType<CheckpointManager>();
+                if (!respawnManager) Debug.LogError("Checkpoint Manager not found by Game Manager.");
+            }
+            
             fadeUI = FadeUI.Instance;
             if (!fadeUI) Debug.LogError("Fade UI not found by Game Manager.");
+
+            levelsCollection.levels[0].isUnlocked = true;
+        }
+
+        private void Update()
+        {
+            if (isGameOver) OnGameOver();
         }
 
         private void OnEnable()
@@ -56,6 +74,13 @@ namespace Managers
         public void OnPlayerDeath() => StartCoroutine(PlayerRespawnSequence());
 
         public void OnLevelFinished() => StartCoroutine(DoLevelSwichCo());
+        
+        private void OnGameOver()
+        {
+            // to do: create a UI with options to restart the game or go to main menu
+            Debug.Log("Game Over");
+            isGameOver = false;
+        }
 
         private IEnumerator DoLevelSwichCo()
         {

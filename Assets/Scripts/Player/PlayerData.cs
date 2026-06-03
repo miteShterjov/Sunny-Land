@@ -135,11 +135,12 @@ namespace Player
             OnLivesChanged?.Invoke(currentLives, maxLives);
         }
 
-        private void RemoveOneLife()
+        public void RemoveOneLife()
         {
             if (currentLives <= 0) return;
             currentLives--;
             OnLivesChanged?.Invoke(currentLives, maxLives);
+            print("OnLivesChanged Event Invoked!");
         }
 
         private bool IsStaminaExhausted { get; set; }

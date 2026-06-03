@@ -5,7 +5,7 @@ using Misc;
 
 namespace Managers
 {
-    public class CheckpointManager : Singleton<CheckpointManager>
+    public class CheckpointManager : MonoBehaviour
     {
         private Checkpoint currentActiveRespawnPoint;
         private Vector3 currentRespawnPoint;

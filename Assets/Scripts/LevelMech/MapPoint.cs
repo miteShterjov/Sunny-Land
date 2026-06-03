@@ -19,12 +19,16 @@ namespace LevelMech
 
         private void Awake()
         {
-            if (!levelIconSpRend) Debug.LogError("SpriteRenderer component not found in " + gameObject.name);
+            if (levelData == null)
+            {
+                levelIconSpRend = null;
+                return;
+            }
         }
 
         private void Start()
         {
-            if (levelData.levelIndex == 0) return;
+            if (levelData == null) return;
             ColorLevelIconInactive();
         }
 

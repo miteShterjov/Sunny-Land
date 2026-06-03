@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace Managers
 {
-    public class GameProgressManager : Singleton<GameProgressManager>
+    public class GameProgressManager : MonoBehaviour
     {
         public int CurrentLevel
         {
@@ -25,81 +25,63 @@ namespace Managers
 
         private void Start()
         {
-            if (SceneManager.GetActiveScene().name != "Overworld") return;
-            
+            // gather all the assets we gonna need for this scene
             GetLevelCollection();
             GetAllMapPoints();
             GetPlayerIcon();
             
+            // check if we have all the assets we need, very important for the scene to work
             if (levelsCollection == null) Debug.LogError("No levels collection found in the scene");
             if (mapPoints == null) Debug.LogError("No map points found in the scene");
             if (playerIcon == null) Debug.LogError("Player icon not found in the scene");
-            // mark first level as unlocked from start of the game
-            levelsCollection.levels[0].isUnlocked = true;
-            LoadNextLevelSequence();
-        }
-
-        private void LoadNextLevelSequence() => StartCoroutine(LoadNextLevelSequenceCo());
-
-        private IEnumerator LoadNextLevelSequenceCo()
-        {
-            //mark current level completed
-            CurrentLevelIsCompleted();
-            // unlock next level + highlight next level icon and move playerIcon to next level
-            UnlockNextLevel();
-            yield return StartCoroutine(LerpIconColor(Color.white, Color.gray2, 0.3f));
-            yield return StartCoroutine(MovePlayerIconToNextLevelCo(playerIcon.transform));
-            //when playerIcon is next level icon -> load next level
-        }
-
-        private void CurrentLevelIsCompleted() => levelsCollection.levels[currentLevel].isCompleted = true;
-        private void UnlockNextLevel() => levelsCollection.levels[currentLevel + 1].isUnlocked = true;
-
-        private IEnumerator LerpIconColor(Color from, Color to, float duration)
-        {
-            SpriteRenderer icon = GetNextLevelMapPoint().GetComponentInChildren<SpriteRenderer>();
-            if (!icon)
+            
+            // test if UpdateLevelIconColorsCo() works properly
+            levelsCollection.levels[0].isCompleted = true;
+            levelsCollection.levels[1].isCompleted = true;
+            levelsCollection.levels[2].isCompleted = true;
+            currentLevel = 1;
+            
+            // sync: any completed level should also be marked unlocked
+            foreach (var level in levelsCollection.levels)
             {
-                Debug.LogError("SpriteRenderer component not found in " + GetNextLevelMapPoint().gameObject.name);
-                yield break;
+                if (level.isCompleted) level.isUnlocked = true;
             }
-            float elapsed = 0f;
-
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                icon.color = Color.Lerp(from, to, elapsed / duration);
-                yield return null;
-            }
-
-            icon.color = to;
+            
+            StartCoroutine(UpdateLevelIconColorsCo());
         }
         
-        private IEnumerator MovePlayerIconToNextLevelCo(Transform icon)
+        private IEnumerator UpdateLevelIconColorsCo()
         {
-            MapPoint currentMapPoint = GetCurrentMapPoint();
+            yield return null;
 
-            while (currentMapPoint != null)
+            foreach (var mapPoint in mapPoints)
             {
-                currentMapPoint = currentMapPoint.NextMapPoint;
-                yield return StartCoroutine(MoveIconTo(icon, currentMapPoint.transform.position));
-                
-                if (currentMapPoint.IsLevelPoint) break;
+                if (mapPoint.LevelData == null)
+                {
+                    Debug.LogWarning($"MapPoint '{mapPoint.name}' has no LevelData assigned — skipping.", mapPoint);
+                    continue;
+                }
+
+                if (mapPoint.LevelData.isUnlocked || mapPoint.LevelData.isCompleted)
+                {
+                    mapPoint.ColorLevelIconActive();
+                }
             }
+
+            yield return StartCoroutine(UpdatePlayerIconPosition());
+        }
+
+        private IEnumerator UpdatePlayerIconPosition()
+        {
+            playerIcon.transform.position = GetCurrentMapPoint().transform.position;
+            yield return null;
         }
         
-        private IEnumerator MoveIconTo(Transform icon, Vector3 target)
-        {
-            float speed = 5f;
-    
-            while (Vector3.Distance(icon.position, target) > 0.01f)
-            {
-                icon.position = Vector3.MoveTowards(icon.position, target, speed * Time.deltaTime);
-                yield return null;
-            }
-    
-            icon.position = target;
-        }
+        
+        
+        
+        
+        
         
         private MapPoint GetCurrentMapPoint()
         {
@@ -113,6 +95,12 @@ namespace Managers
                 levelsCollection.levels[currentLevel+1].sceneName == mapPoint.LevelData.sceneName);
         }
 
+        
+        
+        
+        
+        
+        
         private void GetAllMapPoints()
         {
             const int maxPoints = 10; // guard

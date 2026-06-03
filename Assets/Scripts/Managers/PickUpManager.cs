@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Managers
 {
-    public class PickUpManager : Singleton<PickUpManager>
+    public class PickUpManager : MonoBehaviour
     {
         private PlayerData playerStats;
 

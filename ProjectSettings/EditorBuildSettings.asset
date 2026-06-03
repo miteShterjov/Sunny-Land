@@ -5,12 +5,28 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TheLab.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: a788b9309070874488a119ab51ec02d4
+  - enabled: 1
     path: Assets/Scenes/Overworld.unity
     guid: a29b9cb8c5e3817aba126237f37ded75
+  - enabled: 1
+    path: Assets/Scenes/Level 1.unity
+    guid: b08c3143d47a6894782724222aba96e4
+  - enabled: 1
+    path: Assets/Scenes/Level 2.unity
+    guid: 680908daa96bb5de4b997e3a5ffd867f
+  - enabled: 1
+    path: Assets/Scenes/Level 3.unity
+    guid: c687ac40b248ae1fe9f027586a42d90d
+  - enabled: 1
+    path: Assets/Scenes/EndCredits.unity
+    guid: dbbb8bd6b86377a5e9baa4c92e197833
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -1,4 +1,6 @@
 using System;
+using Managers;
+using Player;
 using UnityEngine;
 
 namespace LevelMech
@@ -11,7 +13,8 @@ namespace LevelMech
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.gameObject.CompareTag("Player")) return;
-            Destroy(other.gameObject, destroyDelay);
+            GameManager.Instance.OnPlayerDeath();
+            other.gameObject.SetActive(false);
         }
     }
 }
